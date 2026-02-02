@@ -1,0 +1,21 @@
+{
+  "name": "LIFT",
+  "short_name": "LIFT",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='black'/%3E%3Cpath d='M160 100 h 100 v 260 h 150 v 100 h -250 z' fill='white'/%3E%3Cpath d='M130 100 h 20 v 80 h -20 z' fill='white'/%3E%3Cpath d='M420 370 h 20 v 80 h -20 z' fill='white'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='black'/%3E%3Cpath d='M160 100 h 100 v 260 h 150 v 100 h -250 z' fill='white'/%3E%3Cpath d='M130 100 h 20 v 80 h -20 z' fill='white'/%3E%3Cpath d='M420 370 h 20 v 80 h -20 z' fill='white'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

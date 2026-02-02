@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <title>LIFT</title>
+    
+    <!-- iOS PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="LIFT" />
+    <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+
+    <!-- App Icon -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='black'/%3E%3Cpath d='M160 100 h 100 v 260 h 150 v 100 h -250 z' fill='white'/%3E%3Cpath d='M130 100 h 20 v 80 h -20 z' fill='white'/%3E%3Cpath d='M420 370 h 20 v 80 h -20 z' fill='white'/%3E%3Ctext x='256' y='490' font-family='sans-serif' font-size='40' font-weight='bold' fill='white' text-anchor='middle' opacity='0'%3ELIFT%3C/text%3E%3C/svg%3E" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'media',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['-apple-system', 'BlinkMacSystemFont', 'San Francisco', 'Helvetica Neue', 'sans-serif'],
+            },
+            colors: {
+              ios: {
+                bg: 'var(--ios-bg)',
+                card: 'var(--ios-card)',
+                text: 'var(--ios-text)',
+                blue: '#007AFF',
+                gray: '#8E8E93',
+                separator: 'var(--ios-separator)',
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      :root {
+        --ios-bg: #F2F2F7;
+        --ios-card: #FFFFFF;
+        --ios-text: #000000;
+        --ios-separator: #C6C6C8;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --ios-bg: #000000;
+          --ios-card: #1C1C1E;
+          --ios-text: #FFFFFF;
+          --ios-separator: #38383A;
+        }
+      }
+      body {
+        background-color: var(--ios-bg);
+        color: var(--ios-text);
+        -webkit-tap-highlight-color: transparent;
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+      }
+      /* Hide scrollbar for cleaner look */
+      ::-webkit-scrollbar {
+        width: 0px;
+        background: transparent;
+      }
+    </style>
+    <link rel="manifest" href="/manifest.json">
+  <script type="importmap">
+{
+  "imports": {
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+    <!-- Register Service Worker -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('SW registered'))
+            .catch(err => console.log('SW failed', err));
+        });
+      }
+    </script>
+  </body>
+</html>

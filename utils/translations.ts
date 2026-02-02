@@ -1,0 +1,175 @@
+export const translations = {
+  es: {
+    appTitle: 'LIFT',
+    muscleGroups: {
+      Pecho: 'Pecho',
+      Espalda: 'Espalda',
+      Pierna: 'Pierna',
+      Hombro: 'Hombro',
+      Bíceps: 'Bíceps',
+      Tríceps: 'Tríceps',
+      Abdominales: 'Abdominales',
+      Cardio: 'Cardio',
+      Otro: 'Otro'
+    },
+    actions: {
+      cancel: 'Cancelar',
+      save: 'Guardar',
+      delete: 'Eliminar',
+      rename: 'Renombrar',
+      log: 'Registrar',
+      close: 'Cerrar',
+      addGroup: 'Añadir Grupo',
+      export: 'Exportar Backup',
+      import: 'Importar Backup',
+      edit: 'Editar',
+      install: 'Instálame'
+    },
+    prompts: {
+      deleteExercise: '¿Eliminar "{name}"?',
+      deleteGroup: '¿Eliminar grupo "{name}"? Los ejercicios se moverán a "Otro".',
+      renameGroup: 'Nuevo nombre para el grupo:',
+      renameExercise: 'Nuevo nombre para el ejercicio:',
+      newGroupName: 'Nombre del nuevo grupo muscular:',
+      confirmDelete: 'Confirmar eliminación'
+    },
+    labels: {
+      empty: 'Vacío',
+      emptyDesc: 'Añade un ejercicio a {group}',
+      noExercises: 'No hay ejercicios',
+      noExercisesDesc: 'Toca el + para empezar',
+      weight: 'Peso (kg)',
+      reps: 'Reps',
+      progress: 'Progreso',
+      settings: 'Configuración',
+      newExercise: 'Nuevo Ejercicio',
+      editExercise: 'Editar Ejercicio',
+      name: 'Nombre',
+      muscleGroup: 'Grupo Muscular',
+      ago: 'Hace',
+      exercises: 'ejercicios',
+      exportDesc: 'Guardar datos en archivo JSON',
+      importDesc: 'Cargar datos desde JSON',
+      importSuccess: 'Datos importados correctamente',
+      importError: 'Error al leer el archivo',
+      noLogs: 'Sin registros',
+      installGuide: 'Instalar App',
+      installIosSafari: 'Safari (iPhone)',
+      installIosChrome: 'Chrome (iPhone)',
+      installAndroid: 'Chrome (Android)',
+      stepShare: 'Toca el botón Compartir',
+      stepAdd: 'Selecciona "Añadir a inicio"',
+      stepMenu: 'Toca los tres puntos',
+      stepInstall: 'Selecciona "Instalar aplicación"',
+      home: 'Inicio',
+      insights: 'Insights',
+      recentProgress: 'Tus progresos recientes',
+      noInsights: 'Sin progresos',
+      noInsightsDesc: 'Empieza a registrar ejercicios para ver tu progreso',
+      maxWeight: 'Peso máx',
+      maxReps: 'Repes máx',
+      totalExercises: 'Total Ejercicios',
+      withProgress: 'Con Progreso',
+      settingsDesc: 'Gestiona tus datos y copias de seguridad',
+      settingsInfo: 'Tus datos se guardan localmente en el dispositivo. Usa la copia de seguridad para transferir tus datos a otro dispositivo.'
+    },
+    time: {
+      days: 'días',
+      day: 'día',
+      weeks: 'semanas',
+      week: 'semana',
+      months: 'meses',
+      month: 'mes'
+    }
+  },
+  en: {
+    appTitle: 'LIFT',
+    muscleGroups: {
+      Pecho: 'Chest',
+      Espalda: 'Back',
+      Pierna: 'Legs',
+      Hombro: 'Shoulders',
+      Bíceps: 'Biceps',
+      Tríceps: 'Triceps',
+      Abdominales: 'Abs',
+      Cardio: 'Cardio',
+      Otro: 'Other'
+    },
+    actions: {
+      cancel: 'Cancel',
+      save: 'Save',
+      delete: 'Delete',
+      rename: 'Rename',
+      log: 'Log',
+      close: 'Close',
+      addGroup: 'Add Group',
+      export: 'Export Backup',
+      import: 'Import Backup',
+      edit: 'Edit',
+      install: 'Install Me'
+    },
+    prompts: {
+      deleteExercise: 'Delete "{name}"?',
+      deleteGroup: 'Delete group "{name}"? Exercises will move to "Other".',
+      renameGroup: 'New name for group:',
+      renameExercise: 'New name for exercise:',
+      newGroupName: 'Name of the new muscle group:',
+      confirmDelete: 'Confirm deletion'
+    },
+    labels: {
+      empty: 'Empty',
+      emptyDesc: 'Add an exercise to {group}',
+      noExercises: 'No exercises',
+      noExercisesDesc: 'Tap + to start',
+      weight: 'Weight (kg)',
+      reps: 'Reps',
+      progress: 'Progress',
+      settings: 'Settings',
+      newExercise: 'New Exercise',
+      editExercise: 'Edit Exercise',
+      name: 'Name',
+      muscleGroup: 'Muscle Group',
+      ago: 'Ago',
+      exercises: 'exercises',
+      exportDesc: 'Save data to JSON file',
+      importDesc: 'Load data from JSON',
+      importSuccess: 'Data imported successfully',
+      importError: 'Error reading file',
+      noLogs: 'No logs',
+      installGuide: 'Install App',
+      installIosSafari: 'Safari (iPhone)',
+      installIosChrome: 'Chrome (iPhone)',
+      installAndroid: 'Chrome (Android)',
+      stepShare: 'Tap the Share button',
+      stepAdd: 'Select "Add to Home Screen"',
+      stepMenu: 'Tap the three dots',
+      stepInstall: 'Select "Install App"',
+      home: 'Home',
+      insights: 'Insights',
+      recentProgress: 'Your recent progressions',
+      noInsights: 'No progressions',
+      noInsightsDesc: 'Start logging exercises to see your progress',
+      maxWeight: 'Max weight',
+      maxReps: 'Max reps',
+      totalExercises: 'Total Exercises',
+      withProgress: 'With Progress',
+      settingsDesc: 'Manage your data and backups',
+      settingsInfo: 'Your data is stored locally on your device. Use backup to transfer your data to another device.'
+    },
+    time: {
+      days: 'days',
+      day: 'day',
+      weeks: 'weeks',
+      week: 'week',
+      months: 'months',
+      month: 'month'
+    }
+  }
+};
+
+export const getLanguage = (): 'es' | 'en' => {
+  const lang = navigator.language.split('-')[0];
+  return lang === 'es' ? 'es' : 'en';
+};
+
+export const t = translations[getLanguage()];
