@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { getLastProgressionDate, calculateProgression, getCurrentMax, getRecentProgressions } from './progression';
+import { getLastProgressionDate, calculateProgression, getLatestLog, getRecentProgressions } from './progression';
 import { ExerciseLog, Exercise } from '../types';
 
 describe('progression utilities', () => {
@@ -195,38 +195,26 @@ describe('progression utilities', () => {
     });
   });
 
-  describe('getCurrentMax', () => {
+  describe('getLatestLog', () => {
     it('should return null for empty logs', () => {
-      expect(getCurrentMax([])).toBeNull();
+      expect(getLatestLog([])).toBeNull();
     });
 
     it('should return the only log', () => {
       const logs: ExerciseLog[] = [{ date: '2026-02-01', weight: 50, reps: 10 }];
-      expect(getCurrentMax(logs)).toEqual({ date: '2026-02-01', weight: 50, reps: 10 });
+      expect(getLatestLog(logs)).toEqual({ date: '2026-02-01', weight: 50, reps: 10 });
     });
 
-    it('should prioritize highest weight', () => {
+    it('should return the last log', () => {
       const logs: ExerciseLog[] = [
-        { date: '2026-02-01', weight: 50, reps: 10 },
-        { date: '2026-02-02', weight: 55, reps: 8 },
+        { date: '2023-10-27', weight: 60, reps: 10 },
+        { date: '2026-01-07', weight: 100, reps: 8 },
+        { date: '2026-02-04', weight: 80, reps: 8 },
       ];
-      expect(getCurrentMax(logs)).toEqual({ date: '2026-02-02', weight: 55, reps: 8 });
-    });
-
-    it('should use highest reps for same weight', () => {
-      const logs: ExerciseLog[] = [
-        { date: '2026-02-01', weight: 50, reps: 10 },
-        { date: '2026-02-02', weight: 50, reps: 12 },
-      ];
-      expect(getCurrentMax(logs)).toEqual({ date: '2026-02-02', weight: 50, reps: 12 });
-    });
-
-    it('should use most recent for identical weight/reps', () => {
-      const logs: ExerciseLog[] = [
-        { date: '2026-02-01', weight: 50, reps: 10 },
-        { date: '2026-02-02', weight: 50, reps: 10 },
-      ];
-      expect(getCurrentMax(logs)).toEqual({ date: '2026-02-02', weight: 50, reps: 10 });
+      const result = getLatestLog(logs);
+      expect(result).not.toBeNull();
+      expect(result?.weight).toBe(80);
+      expect(result?.date).toBe('2026-02-04');
     });
   });
 });

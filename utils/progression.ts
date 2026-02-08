@@ -19,6 +19,12 @@ export const getLastProgressionDate = (logs: ExerciseLog[]): string | null => {
   return sortedLogs[sortedLogs.length - 1].date;
 };
 
+export const getLatestLog = (logs: ExerciseLog[]): ExerciseLog | null => {
+  if (!logs || logs.length === 0) return null;
+  const sortedLogs = [...logs].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  return sortedLogs[0];
+};
+
 export interface RecentProgression {
   exerciseId: string;
   exerciseName: string;
@@ -35,8 +41,8 @@ export const getRecentProgressions = (exercises: Exercise[], limit: number = 3):
       const lastProgressionDate = getLastProgressionDate(exercise.logs);
       if (!lastProgressionDate) return null;
 
-      const currentMax = getCurrentMax(exercise.logs);
-      if (!currentMax) return null;
+      const latestLog = getLatestLog(exercise.logs);
+      if (!latestLog) return null;
 
       const progressionText = calculateProgression(exercise.logs);
       if (!progressionText) return null;
@@ -46,8 +52,8 @@ export const getRecentProgressions = (exercises: Exercise[], limit: number = 3):
         exerciseName: exercise.name,
         muscleGroup: exercise.muscleGroup,
         lastProgressionDate,
-        weight: currentMax.weight,
-        reps: currentMax.reps,
+        weight: latestLog.weight,
+        reps: latestLog.reps,
         progressionText,
       };
     })
@@ -75,14 +81,4 @@ export const calculateProgression = (logs: ExerciseLog[]): string | null => {
     const months = Math.floor(diffDays / 30);
     return `${months} mes${months !== 1 ? 'es' : ''}`;
   }
-};
-
-export const getCurrentMax = (logs: ExerciseLog[]): ExerciseLog | null => {
-  if (!logs || logs.length === 0) return null;
-  return logs.reduce((prev, current) => {
-    if (current.weight > prev.weight) return current;
-    if (current.weight === prev.weight && current.reps > prev.reps) return current;
-    if (current.weight === prev.weight && current.reps === prev.reps && current.date > prev.date) return current;
-    return prev;
-  }, logs[0]);
 };

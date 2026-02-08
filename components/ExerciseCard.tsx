@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Exercise } from '../types';
-import { calculateProgression, getCurrentMax } from '../utils/progression';
+import { calculateProgression, getLatestLog } from '../utils/progression';
 import { Trash2, Pencil } from 'lucide-react';
 import { t } from '../utils/translations';
 
@@ -13,7 +13,7 @@ interface Props {
 
 export const ExerciseCard: React.FC<Props> = ({ exercise, onLog, onDelete, onRename }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const currentMax = getCurrentMax(exercise.logs);
+  const currentStatus = getLatestLog(exercise.logs);
   const progression = calculateProgression(exercise.logs);
 
   // Form State
@@ -138,11 +138,11 @@ export const ExerciseCard: React.FC<Props> = ({ exercise, onLog, onDelete, onRen
             <div className="flex-1">
             <h3 className="text-lg font-semibold text-ios-text">{exercise.name}</h3>
             <div className="flex items-center space-x-2 mt-1">
-                {currentMax ? (
+                {currentStatus ? (
                 <span className="text-2xl font-bold tracking-tight text-ios-text">
-                    {currentMax.weight}<span className="text-sm font-normal text-ios-gray ml-0.5">kg</span>
+                    {currentStatus.weight}<span className="text-sm font-normal text-ios-gray ml-0.5">kg</span>
                     <span className="text-gray-300 dark:text-gray-600 mx-2">/</span>
-                    {currentMax.reps}<span className="text-sm font-normal text-ios-gray ml-0.5">{t.labels.reps.toLowerCase()}</span>
+                    {currentStatus.reps}<span className="text-sm font-normal text-ios-gray ml-0.5">{t.labels.reps.toLowerCase()}</span>
                 </span>
                 ) : (
                 <span className="text-ios-gray text-sm">{t.labels.noLogs}</span>
@@ -170,7 +170,7 @@ export const ExerciseCard: React.FC<Props> = ({ exercise, onLog, onDelete, onRen
                     inputMode="decimal"
                     value={weight}
                     onChange={(e) => setWeight(e.target.value)}
-                    placeholder={currentMax?.weight.toString() || "0"}
+                    placeholder={currentStatus?.weight.toString() || "0"}
                     className="w-full bg-ios-bg text-ios-text text-lg p-3 rounded-xl border-none outline-none focus:ring-2 focus:ring-ios-blue"
                 />
                 </div>
@@ -181,7 +181,7 @@ export const ExerciseCard: React.FC<Props> = ({ exercise, onLog, onDelete, onRen
                     inputMode="numeric"
                     value={reps}
                     onChange={(e) => setReps(e.target.value)}
-                    placeholder={currentMax?.reps.toString() || "0"}
+                    placeholder={currentStatus?.reps.toString() || "0"}
                     className="w-full bg-ios-bg text-ios-text text-lg p-3 rounded-xl border-none outline-none focus:ring-2 focus:ring-ios-blue"
                 />
                 </div>
