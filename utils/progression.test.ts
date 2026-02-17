@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { getLastProgressionDate, calculateProgression, getLatestLog, getRecentProgressions } from './progression';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { getLastProgressionDate, calculateProgression, getLatestLog, getRecentProgressions, calculateTimeSince } from './progression';
 import { ExerciseLog, Exercise } from '../types';
+import { t } from './translations';
 
 describe('progression utilities', () => {
   let today: Date;
@@ -9,6 +10,10 @@ describe('progression utilities', () => {
     today = new Date('2026-02-02');
     vi.useFakeTimers();
     vi.setSystemTime(today);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   describe('getLastProgressionDate', () => {
@@ -81,37 +86,37 @@ describe('progression utilities', () => {
     it('should calculate days ago correctly', () => {
       const logs: ExerciseLog[] = [{ date: '2026-01-30', weight: 50, reps: 10 }];
       const result = calculateProgression(logs);
-      expect(result).toBe('3 días');
+      expect(result).toBe(`3 ${t.time.days}`);
     });
 
-    it('should calculate weeks correctly', () => {
+    it('should calculate months correctly after four weeks', () => {
       const logs: ExerciseLog[] = [{ date: '2026-01-02', weight: 50, reps: 10 }];
       const result = calculateProgression(logs);
-      expect(result).toBe('4 semanas');
+      expect(result).toBe(`1 ${t.time.month}`);
     });
 
     it('should calculate months correctly', () => {
       const logs: ExerciseLog[] = [{ date: '2025-10-02', weight: 50, reps: 10 }];
       const result = calculateProgression(logs);
-      expect(result).toBe('4 meses');
+      expect(result).toBe(`4 ${t.time.months}`);
     });
 
-    it('should use singular form for 1 day', () => {
+    it('should use yesterday for 1 day', () => {
       const logs: ExerciseLog[] = [{ date: '2026-02-01', weight: 50, reps: 10 }];
       const result = calculateProgression(logs);
-      expect(result).toBe('1 día');
+      expect(result).toBe(t.time.yesterday);
     });
 
-    it('should calculate weeks correctly when past threshold', () => {
+    it('should calculate months for longer ranges', () => {
       const logs: ExerciseLog[] = [{ date: '2026-01-02', weight: 50, reps: 10 }];
       const result = calculateProgression(logs);
-      expect(result).toBe('4 semanas');
+      expect(result).toBe(`1 ${t.time.month}`);
     });
 
-    it('should use singular form for 1 month', () => {
+    it('should calculate months with larger spans', () => {
       const logs: ExerciseLog[] = [{ date: '2025-11-01', weight: 50, reps: 10 }];
       const result = calculateProgression(logs);
-      expect(result).toBe('3 meses');
+      expect(result).toBe(`3 ${t.time.months}`);
     });
 
     it('should consider last variation date, not all-time max', () => {
@@ -119,7 +124,12 @@ describe('progression utilities', () => {
         { date: '2026-01-01', weight: 100, reps: 10 },
         { date: '2026-02-01', weight: 50, reps: 10 },
       ];
-      expect(calculateProgression(logs)).toBe('1 día');
+      expect(calculateProgression(logs)).toBe(t.time.yesterday);
+    });
+
+    it('should return today for same-day progression', () => {
+      const logs: ExerciseLog[] = [{ date: '2026-02-02', weight: 50, reps: 10 }];
+      expect(calculateProgression(logs)).toBe(t.time.today);
     });
   });
 
@@ -190,7 +200,7 @@ describe('progression utilities', () => {
         lastProgressionDate: '2026-02-01',
         weight: 50,
         reps: 10,
-        progressionText: '1 día',
+        progressionText: t.time.yesterday,
       });
     });
   });
@@ -215,6 +225,12 @@ describe('progression utilities', () => {
       expect(result).not.toBeNull();
       expect(result?.weight).toBe(80);
       expect(result?.date).toBe('2026-02-04');
+    });
+  });
+
+  describe('calculateTimeSince', () => {
+    it('should calculate today correctly', () => {
+      expect(calculateTimeSince('2026-02-02')).toBe(t.time.today);
     });
   });
 });

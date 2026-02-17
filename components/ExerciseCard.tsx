@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Exercise } from '../types';
 import { calculateProgression, getLatestLog } from '../utils/progression';
 import { Trash2, Pencil } from 'lucide-react';
@@ -9,9 +9,12 @@ interface Props {
   onLog: (weight: number, reps: number) => void;
   onDelete: () => void;
   onRename: () => void;
+  onUpdateNote: (note: string) => void;
 }
 
-export const ExerciseCard: React.FC<Props> = ({ exercise, onLog, onDelete, onRename }) => {
+const SWIPE_ACTIVATION_THRESHOLD = 30;
+
+export const ExerciseCard: React.FC<Props> = ({ exercise, onLog, onDelete, onRename, onUpdateNote }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const currentStatus = getLatestLog(exercise.logs);
   const progression = calculateProgression(exercise.logs);
@@ -19,27 +22,43 @@ export const ExerciseCard: React.FC<Props> = ({ exercise, onLog, onDelete, onRen
   // Form State
   const [weight, setWeight] = useState<string>('');
   const [reps, setReps] = useState<string>('');
+  const [note, setNote] = useState<string>(exercise.note ?? '');
 
   // Swipe State
   const [translateX, setTranslateX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const startX = useRef<number>(0);
+  const startY = useRef<number>(0);
   const startTranslate = useRef<number>(0);
+
+  useEffect(() => {
+    setNote(exercise.note ?? '');
+  }, [exercise.note]);
 
   // Touch Handlers
   const handleTouchStart = (e: React.TouchEvent) => {
     // Prevent swipe if interacting with inputs
-    if ((e.target as HTMLElement).tagName === 'INPUT') return;
+    const tagName = (e.target as HTMLElement).tagName;
+    if (tagName === 'INPUT' || tagName === 'TEXTAREA') return;
     
     startX.current = e.touches[0].clientX;
+    startY.current = e.touches[0].clientY;
     startTranslate.current = translateX;
-    setIsDragging(true);
+    setIsDragging(false);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging) return;
     const currentX = e.touches[0].clientX;
+    const currentY = e.touches[0].clientY;
     const diff = currentX - startX.current;
+    const diffY = currentY - startY.current;
+
+    if (!isDragging) {
+      if (Math.abs(diff) < SWIPE_ACTIVATION_THRESHOLD || Math.abs(diff) < Math.abs(diffY)) {
+        return;
+      }
+      setIsDragging(true);
+    }
     
     // Calculate new position
     let newX = startTranslate.current + diff;
@@ -162,6 +181,17 @@ export const ExerciseCard: React.FC<Props> = ({ exercise, onLog, onDelete, onRen
 
         {isExpanded && (
             <div className="mt-6 pt-4 border-t border-ios-separator animate-fadeIn" onTouchStart={(e) => e.stopPropagation()}>
+            <div className="mb-4">
+                <label className="block text-xs font-medium text-ios-gray mb-1 ml-1">{t.labels.note}</label>
+                <input
+                    type="text"
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    onBlur={() => onUpdateNote(note)}
+                    placeholder={t.labels.notePlaceholder}
+                    className="w-full bg-ios-bg text-ios-text text-base p-3 rounded-xl border-none outline-none focus:ring-2 focus:ring-ios-blue"
+                />
+            </div>
             <form onSubmit={handleSubmit} className="flex gap-3">
                 <div className="flex-1">
                 <label className="block text-xs font-medium text-ios-gray mb-1 ml-1">{t.labels.weight}</label>

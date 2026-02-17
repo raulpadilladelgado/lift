@@ -41,13 +41,23 @@ export const translations = {
       weight: 'Peso (kg)',
       reps: 'Reps',
       progress: 'Progreso',
+      note: 'Nota',
+      notePlaceholder: 'Añade una nota',
       settings: 'Configuración',
+      history: 'Histórico',
+      historyDesc: 'Listado completo de ejercicios',
       newExercise: 'Nuevo Ejercicio',
       editExercise: 'Editar Ejercicio',
       name: 'Nombre',
       muscleGroup: 'Grupo Muscular',
+      date: 'Fecha',
       ago: 'Hace',
       exercises: 'ejercicios',
+      sessions: 'Registros',
+      sortBy: 'Ordenar por',
+      orderAsc: 'Asc',
+      orderDesc: 'Desc',
+      weightShort: 'Peso',
       exportDesc: 'Guardar datos en archivo JSON',
       importDesc: 'Cargar datos desde JSON',
       importSuccess: 'Datos importados correctamente',
@@ -63,7 +73,10 @@ export const translations = {
       stepInstall: 'Selecciona "Instalar aplicación"',
       home: 'Inicio',
       insights: 'Insights',
+      insightsDesc: 'Resumen de tu progreso',
       recentProgress: 'Tus progresos recientes',
+      topWeightExercises: 'Top por peso',
+      mostFrequentExercises: 'Más frecuentes',
       noInsights: 'Sin progresos',
       noInsightsDesc: 'Empieza a registrar ejercicios para ver tu progreso',
       maxWeight: 'Peso máx',
@@ -74,12 +87,16 @@ export const translations = {
       settingsInfo: 'Tus datos se guardan localmente en el dispositivo. Usa la copia de seguridad para transferir tus datos a otro dispositivo.'
     },
     time: {
+      today: 'Hoy',
+      yesterday: 'Ayer',
       days: 'días',
       day: 'día',
       weeks: 'semanas',
       week: 'semana',
       months: 'meses',
-      month: 'mes'
+      month: 'mes',
+      years: 'años',
+      year: 'año'
     }
   },
   en: {
@@ -124,13 +141,23 @@ export const translations = {
       weight: 'Weight (kg)',
       reps: 'Reps',
       progress: 'Progress',
+      note: 'Note',
+      notePlaceholder: 'Add a note',
       settings: 'Settings',
+      history: 'History',
+      historyDesc: 'Complete exercise list',
       newExercise: 'New Exercise',
       editExercise: 'Edit Exercise',
       name: 'Name',
       muscleGroup: 'Muscle Group',
+      date: 'Date',
       ago: 'Ago',
       exercises: 'exercises',
+      sessions: 'Logs',
+      sortBy: 'Sort by',
+      orderAsc: 'Asc',
+      orderDesc: 'Desc',
+      weightShort: 'Weight',
       exportDesc: 'Save data to JSON file',
       importDesc: 'Load data from JSON',
       importSuccess: 'Data imported successfully',
@@ -146,7 +173,10 @@ export const translations = {
       stepInstall: 'Select "Install App"',
       home: 'Home',
       insights: 'Insights',
+      insightsDesc: 'Progress summary',
       recentProgress: 'Your recent progressions',
+      topWeightExercises: 'Top weight',
+      mostFrequentExercises: 'Most frequent',
       noInsights: 'No progressions',
       noInsightsDesc: 'Start logging exercises to see your progress',
       maxWeight: 'Max weight',
@@ -157,17 +187,22 @@ export const translations = {
       settingsInfo: 'Your data is stored locally on your device. Use backup to transfer your data to another device.'
     },
     time: {
+      today: 'Today',
+      yesterday: 'Yesterday',
       days: 'days',
       day: 'day',
       weeks: 'weeks',
       week: 'week',
       months: 'months',
-      month: 'month'
+      month: 'month',
+      years: 'years',
+      year: 'year'
     }
   }
 };
 
 export const getLanguage = (): 'es' | 'en' => {
+  if (typeof navigator === 'undefined') return 'es';
   const lang = navigator.language.split('-')[0];
   return lang === 'es' ? 'es' : 'en';
 };

@@ -1,5 +1,6 @@
 import { ExerciseLog } from '../types';
 import { Exercise } from '../types';
+import { t } from './translations';
 
 export const getLastProgressionDate = (logs: ExerciseLog[]): string | null => {
   if (!logs || logs.length < 1) return null;
@@ -66,19 +67,32 @@ export const calculateProgression = (logs: ExerciseLog[]): string | null => {
   const lastProgressionDate = getLastProgressionDate(logs);
   if (!lastProgressionDate) return null;
 
-  const progressionDate = new Date(lastProgressionDate);
-  const today = new Date();
+  return calculateTimeSince(lastProgressionDate);
+};
 
-  const diffTime = Math.abs(today.getTime() - progressionDate.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+const formatRelativeDays = (diffDays: number): string => {
+  if (diffDays <= 0) return t.time.today;
+  if (diffDays === 1) return t.time.yesterday;
+  if (diffDays < 7) return `${diffDays} ${t.time.days}`;
 
-  if (diffDays < 14) {
-    return `${diffDays} día${diffDays !== 1 ? 's' : ''}`;
-  } else if (diffDays <= 56) {
-    const weeks = Math.floor(diffDays / 7);
-    return `${weeks} semana${weeks !== 1 ? 's' : ''}`;
-  } else {
-    const months = Math.floor(diffDays / 30);
-    return `${months} mes${months !== 1 ? 'es' : ''}`;
+  const weeks = Math.floor(diffDays / 7);
+  if (weeks < 4) {
+    return `${weeks} ${weeks === 1 ? t.time.week : t.time.weeks}`;
   }
+
+  const months = Math.max(1, Math.floor(diffDays / 30));
+  if (months < 12) {
+    return `${months} ${months === 1 ? t.time.month : t.time.months}`;
+  }
+
+  const years = Math.max(1, Math.floor(months / 12));
+  return `${years} ${years === 1 ? t.time.year : t.time.years}`;
+};
+
+export const calculateTimeSince = (date: string): string => {
+  const targetDate = new Date(date);
+  const today = new Date();
+  const diffTime = Math.abs(today.getTime() - targetDate.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return formatRelativeDays(diffDays);
 };

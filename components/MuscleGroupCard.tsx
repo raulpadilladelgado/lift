@@ -10,11 +10,14 @@ interface Props {
   onRename: () => void;
 }
 
+const SWIPE_ACTIVATION_THRESHOLD = 30;
+
 export const MuscleGroupCard: React.FC<Props> = ({ group, count, onClick, onDelete, onRename }) => {
   // Swipe State
   const [translateX, setTranslateX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const startX = useRef<number>(0);
+  const startY = useRef<number>(0);
   const startTranslate = useRef<number>(0);
 
   // Try to find translation for group, otherwise show as is
@@ -25,14 +28,23 @@ export const MuscleGroupCard: React.FC<Props> = ({ group, count, onClick, onDele
   // Touch Handlers
   const handleTouchStart = (e: React.TouchEvent) => {
     startX.current = e.touches[0].clientX;
+    startY.current = e.touches[0].clientY;
     startTranslate.current = translateX;
-    setIsDragging(true);
+    setIsDragging(false);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging) return;
     const currentX = e.touches[0].clientX;
+    const currentY = e.touches[0].clientY;
     const diff = currentX - startX.current;
+    const diffY = currentY - startY.current;
+
+    if (!isDragging) {
+      if (Math.abs(diff) < SWIPE_ACTIVATION_THRESHOLD || Math.abs(diff) < Math.abs(diffY)) {
+        return;
+      }
+      setIsDragging(true);
+    }
     
     // Calculate new position
     let newX = startTranslate.current + diff;

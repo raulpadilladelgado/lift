@@ -1,7 +1,9 @@
-import { Exercise, ExerciseLog, StorageManagerInterface } from '../types';
+import { Exercise, ExerciseLog, GroupSortPreference, StorageManagerInterface } from '../types';
+import { DEFAULT_GROUP_SORT_PREFERENCE } from '../utils/exerciseSorting';
 
 const STORAGE_KEY = 'lift_data_v1';
 const GROUPS_KEY = 'lift_groups_v1';
+const GROUP_SORT_KEY = 'lift_group_sort_v1';
 
 const DEFAULT_GROUPS = [
   'Pecho',
@@ -80,6 +82,50 @@ class LocalStorageManager implements StorageManagerInterface {
     }
   }
 
+  updateExerciseNote(id: string, note: string): void {
+    const exercises = this.loadData();
+    const exercise = exercises.find((e) => e.id === id);
+    if (exercise) {
+      const trimmedNote = note.trim();
+      exercise.note = trimmedNote.length > 0 ? trimmedNote : undefined;
+      this.saveData(exercises);
+    }
+  }
+
+  updateExerciseLog(exerciseId: string, originalDate: string, log: ExerciseLog): void {
+    const exercises = this.loadData();
+    const exercise = exercises.find((e) => e.id === exerciseId);
+    if (!exercise) return;
+
+    const originalIndex = exercise.logs.findIndex((item) => item.date === originalDate);
+    if (originalIndex === -1) return;
+
+    const updatedLog: ExerciseLog = {
+      date: log.date,
+      weight: log.weight,
+      reps: log.reps,
+    };
+
+    const existingIndex = exercise.logs.findIndex((item) => item.date === updatedLog.date);
+    if (existingIndex !== -1 && existingIndex !== originalIndex) {
+      exercise.logs[existingIndex] = updatedLog;
+      exercise.logs.splice(originalIndex, 1);
+    } else {
+      exercise.logs[originalIndex] = updatedLog;
+    }
+
+    this.saveData(exercises);
+  }
+
+  deleteExerciseLog(exerciseId: string, date: string): void {
+    const exercises = this.loadData();
+    const exercise = exercises.find((e) => e.id === exerciseId);
+    if (exercise) {
+      exercise.logs = exercise.logs.filter((log) => log.date !== date);
+      this.saveData(exercises);
+    }
+  }
+
   getMuscleGroups(): string[] {
     const data = localStorage.getItem(GROUPS_KEY);
     if (data) {
@@ -135,6 +181,28 @@ class LocalStorageManager implements StorageManagerInterface {
       });
       if (changed) this.saveData(exercises);
     }
+  }
+
+  getGroupSortPreference(): GroupSortPreference {
+    const data = localStorage.getItem(GROUP_SORT_KEY);
+    if (!data) return DEFAULT_GROUP_SORT_PREFERENCE;
+
+    try {
+      const parsed = JSON.parse(data) as GroupSortPreference;
+      const isValidField = parsed.field === 'progress' || parsed.field === 'weight';
+      const isValidDirection = parsed.direction === 'asc' || parsed.direction === 'desc';
+      if (isValidField && isValidDirection) {
+        return parsed;
+      }
+    } catch {
+      // Ignore invalid data and fall back to default
+    }
+
+    return DEFAULT_GROUP_SORT_PREFERENCE;
+  }
+
+  saveGroupSortPreference(preference: GroupSortPreference): void {
+    localStorage.setItem(GROUP_SORT_KEY, JSON.stringify(preference));
   }
 
   // --- Backup Features ---

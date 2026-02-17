@@ -1,12 +1,14 @@
-import React, { useEffect, useState, useMemo, useRef } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { storageManager } from './services/storageService';
-import { Exercise } from './types';
+import { Exercise, ExerciseLog, GroupSortPreference } from './types';
 import { ExerciseCard } from './components/ExerciseCard';
 import { MuscleGroupCard } from './components/MuscleGroupCard';
 import { SettingsScreen } from './components/SettingsScreen';
 import { InsightsScreen } from './components/InsightsScreen';
+import { HistoryScreen } from './components/HistoryScreen';
 import { BottomNav, ScreenType } from './components/BottomNav';
 import { t, translations } from './utils/translations';
+import { sortExercisesForGroup } from './utils/exerciseSorting';
 import { 
   Plus, 
   Dumbbell, 
@@ -21,6 +23,9 @@ import {
 const App: React.FC = () => {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [muscleGroups, setMuscleGroups] = useState<string[]>([]);
+  const [groupSortPreference, setGroupSortPreference] = useState<GroupSortPreference>(
+    () => storageManager.getGroupSortPreference()
+  );
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('home');
   const [isAdding, setIsAdding] = useState(false);
   const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
@@ -35,6 +40,7 @@ const App: React.FC = () => {
   const loadData = () => {
     setExercises(storageManager.getExercises());
     setMuscleGroups(storageManager.getMuscleGroups());
+    setGroupSortPreference(storageManager.getGroupSortPreference());
   };
 
   useEffect(() => {
@@ -87,6 +93,21 @@ const App: React.FC = () => {
 
   const handleLog = (id: string, weight: number, reps: number) => {
     storageManager.logSession(id, weight, reps);
+    loadData();
+  };
+
+  const handleUpdateNote = (id: string, note: string) => {
+    storageManager.updateExerciseNote(id, note);
+    loadData();
+  };
+
+  const handleUpdateLog = (exerciseId: string, originalDate: string, log: ExerciseLog) => {
+    storageManager.updateExerciseLog(exerciseId, originalDate, log);
+    loadData();
+  };
+
+  const handleDeleteLog = (exerciseId: string, date: string) => {
+    storageManager.deleteExerciseLog(exerciseId, date);
     loadData();
   };
 
@@ -171,8 +192,24 @@ const App: React.FC = () => {
 
   const currentViewExercises = useMemo(() => {
     if (!activeGroup) return [];
-    return exercises.filter(ex => (ex.muscleGroup || 'Otro') === activeGroup);
-  }, [exercises, activeGroup]);
+    const filtered = exercises.filter(ex => (ex.muscleGroup || 'Otro') === activeGroup);
+    return sortExercisesForGroup(filtered, groupSortPreference);
+  }, [exercises, activeGroup, groupSortPreference]);
+
+  const handleSortFieldChange = (field: GroupSortPreference['field']) => {
+    const nextPreference = { ...groupSortPreference, field };
+    storageManager.saveGroupSortPreference(nextPreference);
+    setGroupSortPreference(nextPreference);
+  };
+
+  const handleSortDirectionToggle = () => {
+    const nextPreference = {
+      ...groupSortPreference,
+      direction: groupSortPreference.direction === 'asc' ? 'desc' : 'asc',
+    };
+    storageManager.saveGroupSortPreference(nextPreference);
+    setGroupSortPreference(nextPreference);
+  };
 
   const getTranslatedGroupName = (group: string) => {
      return (translations.es.muscleGroups as any)[group] 
@@ -232,9 +269,48 @@ const App: React.FC = () => {
           <SettingsScreen onExport={handleExport} onImport={handleImportData} />
         ) : currentScreen === 'insights' ? (
           <InsightsScreen exercises={exercises} />
+        ) : currentScreen === 'history' ? (
+          <HistoryScreen
+            exercises={exercises}
+            onUpdateLog={handleUpdateLog}
+            onDeleteLog={handleDeleteLog}
+          />
         ) : activeGroup ? (
           // Detail View: List of Exercises
           <div className="space-y-4">
+            {currentViewExercises.length > 0 && (
+              <div className="bg-ios-card rounded-2xl p-3 flex items-center justify-between gap-2">
+                <span className="text-xs text-ios-gray uppercase tracking-wide">{t.labels.sortBy}</span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleSortFieldChange('progress')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                      groupSortPreference.field === 'progress'
+                        ? 'bg-ios-blue text-white'
+                        : 'bg-ios-bg text-ios-text active:bg-gray-200 dark:active:bg-gray-700'
+                    }`}
+                  >
+                    {t.labels.progress}
+                  </button>
+                  <button
+                    onClick={() => handleSortFieldChange('weight')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                      groupSortPreference.field === 'weight'
+                        ? 'bg-ios-blue text-white'
+                        : 'bg-ios-bg text-ios-text active:bg-gray-200 dark:active:bg-gray-700'
+                    }`}
+                  >
+                    {t.labels.weightShort}
+                  </button>
+                </div>
+                <button
+                  onClick={handleSortDirectionToggle}
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-ios-bg text-ios-text active:bg-gray-200 dark:active:bg-gray-700"
+                >
+                  {groupSortPreference.direction === 'asc' ? t.labels.orderAsc : t.labels.orderDesc}
+                </button>
+              </div>
+            )}
             {currentViewExercises.length === 0 ? (
               <div className="text-center py-20 opacity-50">
                 <p className="text-ios-text font-medium">{t.labels.empty}</p>
@@ -248,6 +324,7 @@ const App: React.FC = () => {
                   onLog={(w, r) => handleLog(ex.id, w, r)}
                   onDelete={() => handleDelete(ex.id)}
                   onRename={() => handleEditExerciseTrigger(ex)}
+                  onUpdateNote={(note) => handleUpdateNote(ex.id, note)}
                 />
               ))
             )}

@@ -1,8 +1,8 @@
 import React from 'react';
-import { Home, BarChart3, Settings } from 'lucide-react';
+import { Home, BarChart3, Settings, History } from 'lucide-react';
 import { t } from '../utils/translations';
 
-export type ScreenType = 'home' | 'insights' | 'settings';
+export type ScreenType = 'home' | 'insights' | 'settings' | 'history';
 
 interface Props {
   currentScreen: ScreenType;
@@ -14,6 +14,7 @@ export const BottomNav: React.FC<Props> = ({ currentScreen, onScreenChange }) =>
     { id: 'home', label: t.labels.home || 'Home', icon: <Home size={24} /> },
     { id: 'insights', label: t.labels.insights || 'Insights', icon: <BarChart3 size={24} /> },
     { id: 'settings', label: t.labels.settings || 'Settings', icon: <Settings size={24} /> },
+    { id: 'history', label: t.labels.history || 'History', icon: <History size={24} /> },
   ];
 
   return (
