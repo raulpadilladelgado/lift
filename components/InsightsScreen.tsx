@@ -107,7 +107,7 @@ export const InsightsScreen: React.FC<Props> = ({ exercises }) => {
 
                               <div className="flex flex-col items-end gap-2">
                                 <div className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
-                                  {t.labels.ago || 'ago'} {progression.progressionText}
+                                  {progression.progressionText}
                                 </div>
                               </div>
                             </div>
@@ -155,7 +155,7 @@ export const InsightsScreen: React.FC<Props> = ({ exercises }) => {
                               </div>
                               <div className="flex flex-col items-end gap-2">
                                 <div className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap">
-                                  {t.labels.ago || 'ago'} {exercise.timeSince}
+                                  {exercise.timeSince}
                                 </div>
                               </div>
                             </div>

@@ -173,7 +173,7 @@ export const ExerciseCard: React.FC<Props> = ({ exercise, onLog, onDelete, onRen
             <div className="flex flex-col items-end">
                 <span className="text-[10px] uppercase font-bold text-ios-gray tracking-wider mb-0.5">{t.labels.progress}</span>
                 <div className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded-lg text-xs font-medium">
-                {t.labels.ago} {progression}
+                {progression}
                 </div>
             </div>
             )}
