@@ -11,7 +11,6 @@ import { t, translations } from './utils/translations';
 import { sortExercisesForGroup } from './utils/exerciseSorting';
 import { 
   Plus, 
-  Dumbbell, 
   Download, 
   ChevronLeft,
   Pencil,
@@ -19,6 +18,9 @@ import {
   PlusSquare,
   MoreVertical
 } from 'lucide-react';
+
+const APP_LOGO_SRC =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='black'/%3E%3Cpath d='M160 100 h 100 v 260 h 150 v 100 h -250 z' fill='white'/%3E%3Cpath d='M130 100 h 20 v 80 h -20 z' fill='white'/%3E%3Cpath d='M420 370 h 20 v 80 h -20 z' fill='white'/%3E%3C/svg%3E";
 
 const App: React.FC = () => {
   const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -221,10 +223,10 @@ const App: React.FC = () => {
     <div className="min-h-screen pb-24 px-4 sm:max-w-md sm:mx-auto">
       
       {/* Dynamic Header */}
-      <header className="pt-8 pb-6 flex items-center justify-between sticky top-0 z-20 bg-ios-bg/95 backdrop-blur-md">
+      <header className="pt-8 pb-6 sticky top-0 z-20 bg-ios-bg/95 backdrop-blur-md">
         {activeGroup ? (
           // Navigation Header
-          <>
+          <div className="flex items-center justify-between">
             <button 
               onClick={() => setActiveGroup(null)}
               className="w-10 h-10 flex items-center justify-center -ml-2 text-ios-blue active:opacity-60 transition-opacity"
@@ -237,29 +239,28 @@ const App: React.FC = () => {
                 {getTranslatedGroupName(activeGroup)}
               </h1>
             </div>
-          </>
+          </div>
         ) : (
           // Main Dashboard Header
-          <>
-            <div className="text-center flex-1">
+          <div className="grid grid-cols-3 items-center">
+            <div />
+            <div className="flex flex-col items-center text-center">
+              <img src={APP_LOGO_SRC} alt={t.appTitle} className="h-8 w-8 mb-2" />
               <h1 className="text-xl font-bold tracking-tight text-ios-text">{t.appTitle}</h1>
             </div>
 
-            <div className="flex items-center gap-2">
-                {!isStandalone && (
-                    <button
-                        onClick={() => setIsInstallModalOpen(true)}
-                        className="h-8 px-3 rounded-full bg-ios-blue text-white text-xs font-bold flex items-center gap-1 shadow-md animate-pulse active:opacity-80"
-                    >
-                        <Download size={14} />
-                        {t.actions.install}
-                    </button>
-                )}
-                <div className="h-10 w-10 bg-ios-card rounded-full flex items-center justify-center shadow-sm">
-                    <Dumbbell className="text-ios-blue w-5 h-5" />
-                </div>
+            <div className="flex items-center justify-end">
+              {!isStandalone && (
+                <button
+                  onClick={() => setIsInstallModalOpen(true)}
+                  className="h-8 px-3 rounded-full bg-ios-blue text-white text-xs font-bold flex items-center gap-1 shadow-md animate-pulse active:opacity-80"
+                >
+                  <Download size={14} />
+                  {t.actions.install}
+                </button>
+              )}
             </div>
-          </>
+          </div>
         )}
       </header>
 

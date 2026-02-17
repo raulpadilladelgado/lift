@@ -89,10 +89,19 @@ const formatRelativeDays = (diffDays: number): string => {
   return `${years} ${years === 1 ? t.time.year : t.time.years}`;
 };
 
+const getUtcStartOfDay = (date: string): Date => {
+  return new Date(`${date}T00:00:00Z`);
+};
+
+const getTodayUtcStart = (): Date => {
+  const today = new Date().toISOString().split('T')[0];
+  return getUtcStartOfDay(today);
+};
+
 export const calculateTimeSince = (date: string): string => {
-  const targetDate = new Date(date);
-  const today = new Date();
-  const diffTime = Math.abs(today.getTime() - targetDate.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const targetDate = getUtcStartOfDay(date);
+  const today = getTodayUtcStart();
+  const diffTime = today.getTime() - targetDate.getTime();
+  const diffDays = Math.max(0, Math.round(diffTime / (1000 * 60 * 60 * 24)));
   return formatRelativeDays(diffDays);
 };
