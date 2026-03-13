@@ -13,19 +13,16 @@ interface Props {
 const SWIPE_ACTIVATION_THRESHOLD = 30;
 
 export const MuscleGroupCard: React.FC<Props> = ({ group, count, onClick, onDelete, onRename }) => {
-  // Swipe State
   const [translateX, setTranslateX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const startX = useRef<number>(0);
   const startY = useRef<number>(0);
   const startTranslate = useRef<number>(0);
 
-  // Try to find translation for group, otherwise show as is
   const displayName = (translations.es.muscleGroups as any)[group] 
     ? (t.muscleGroups as any)[group] 
     : group;
 
-  // Touch Handlers
   const handleTouchStart = (e: React.TouchEvent) => {
     startX.current = e.touches[0].clientX;
     startY.current = e.touches[0].clientY;
@@ -46,12 +43,10 @@ export const MuscleGroupCard: React.FC<Props> = ({ group, count, onClick, onDele
       setIsDragging(true);
     }
     
-    // Calculate new position
     let newX = startTranslate.current + diff;
     
-    // Clamp values
-    if (newX < -80) newX = -80; // Left (Delete)
-    if (newX > 80) newX = 80;   // Right (Rename)
+    if (newX < -80) newX = -80;
+    if (newX > 80) newX = 80;
 
     setTranslateX(newX);
   };
@@ -60,13 +55,12 @@ export const MuscleGroupCard: React.FC<Props> = ({ group, count, onClick, onDele
     if (!isDragging) return;
     setIsDragging(false);
     
-    // Snap
     if (translateX < -40) {
-      setTranslateX(-80); // Snap Delete
+      setTranslateX(-80);
     } else if (translateX > 40) {
-      setTranslateX(80);  // Snap Rename
+      setTranslateX(80);
     } else {
-      setTranslateX(0);   // Snap Close
+      setTranslateX(0);
     }
   };
 
@@ -88,10 +82,8 @@ export const MuscleGroupCard: React.FC<Props> = ({ group, count, onClick, onDele
 
   const handleCardClick = () => {
     if (translateX !== 0) {
-      // If open, close it
       setTranslateX(0);
     } else {
-      // If closed, navigate
       onClick();
     }
   };
@@ -99,7 +91,6 @@ export const MuscleGroupCard: React.FC<Props> = ({ group, count, onClick, onDele
   return (
     <div className="relative rounded-2xl bg-ios-bg overflow-hidden select-none">
       
-      {/* Background Actions Layer */}
       <div className="absolute inset-0 flex justify-between">
          {/* Left Action (Rename) - Revealed when swiping RIGHT */}
          <div className="bg-blue-500 w-[80px] flex items-center justify-center">
@@ -122,7 +113,6 @@ export const MuscleGroupCard: React.FC<Props> = ({ group, count, onClick, onDele
          </div>
       </div>
 
-      {/* Foreground Card */}
       <div 
         className={`bg-ios-card relative z-10 p-4 transition-transform ${isDragging ? '' : 'duration-300 ease-out'} touch-pan-y flex justify-between items-center active:bg-gray-50 dark:active:bg-gray-800`}
         style={{ transform: `translateX(${translateX}px)` }}

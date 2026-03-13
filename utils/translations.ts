@@ -23,7 +23,9 @@ export const translations = {
       export: 'Exportar Backup',
       import: 'Importar Backup',
       edit: 'Editar',
-      install: 'Instálame'
+      install: 'Instálame',
+      deleteAll: 'Borrar todos',
+      deleteAllExceptLatest: 'Borrar menos el último'
     },
     prompts: {
       deleteExercise: '¿Eliminar "{name}"?',
@@ -31,7 +33,9 @@ export const translations = {
       renameGroup: 'Nuevo nombre para el grupo:',
       renameExercise: 'Nuevo nombre para el ejercicio:',
       newGroupName: 'Nombre del nuevo grupo muscular:',
-      confirmDelete: 'Confirmar eliminación'
+      confirmDelete: 'Confirmar eliminación',
+      confirmDeleteAll: '¿Borrar todos los registros de este ejercicio?',
+      confirmDeleteAllExceptLatest: '¿Borrar todos los registros excepto el más reciente?'
     },
     labels: {
       empty: 'Vacío',
@@ -83,7 +87,16 @@ export const translations = {
       totalExercises: 'Total Ejercicios',
       withProgress: 'Con Progreso',
       settingsDesc: 'Gestiona tus datos y copias de seguridad',
-      settingsInfo: 'Tus datos se guardan localmente en el dispositivo. Usa la copia de seguridad para transferir tus datos a otro dispositivo.'
+      settingsInfo: 'Tus datos se guardan localmente en el dispositivo. Usa la copia de seguridad para transferir tus datos a otro dispositivo.',
+      routines: 'Rutinas',
+      routinesDesc: 'Conjuntos predefinidos de ejercicios',
+      newRoutine: 'Nueva Rutina',
+      editRoutine: 'Editar Rutina',
+      routineName: 'Nombre de la rutina',
+      selectExercises: 'Selecciona ejercicios',
+      noRoutines: 'Sin rutinas',
+      noRoutinesDesc: 'Toca el + para crear tu primera rutina',
+      noExercisesAvailable: 'No hay ejercicios disponibles'
     },
     time: {
       today: 'Hoy',
@@ -122,7 +135,9 @@ export const translations = {
       export: 'Export Backup',
       import: 'Import Backup',
       edit: 'Edit',
-      install: 'Install Me'
+      install: 'Install Me',
+      deleteAll: 'Delete all',
+      deleteAllExceptLatest: 'Keep only latest'
     },
     prompts: {
       deleteExercise: 'Delete "{name}"?',
@@ -130,7 +145,9 @@ export const translations = {
       renameGroup: 'New name for group:',
       renameExercise: 'New name for exercise:',
       newGroupName: 'Name of the new muscle group:',
-      confirmDelete: 'Confirm deletion'
+      confirmDelete: 'Confirm deletion',
+      confirmDeleteAll: 'Delete all logs for this exercise?',
+      confirmDeleteAllExceptLatest: 'Delete all logs except the most recent one?'
     },
     labels: {
       empty: 'Empty',
@@ -182,7 +199,16 @@ export const translations = {
       totalExercises: 'Total Exercises',
       withProgress: 'With Progress',
       settingsDesc: 'Manage your data and backups',
-      settingsInfo: 'Your data is stored locally on your device. Use backup to transfer your data to another device.'
+      settingsInfo: 'Your data is stored locally on your device. Use backup to transfer your data to another device.',
+      routines: 'Routines',
+      routinesDesc: 'Predefined sets of exercises',
+      newRoutine: 'New Routine',
+      editRoutine: 'Edit Routine',
+      routineName: 'Routine name',
+      selectExercises: 'Select exercises',
+      noRoutines: 'No routines',
+      noRoutinesDesc: 'Tap + to create your first routine',
+      noExercisesAvailable: 'No exercises available'
     },
     time: {
       today: 'Today',

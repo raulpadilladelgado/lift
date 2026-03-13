@@ -19,12 +19,10 @@ export const ExerciseCard: React.FC<Props> = ({ exercise, onLog, onDelete, onRen
   const currentStatus = getLatestLog(exercise.logs);
   const progression = calculateProgression(exercise.logs);
 
-  // Form State
   const [weight, setWeight] = useState<string>('');
   const [reps, setReps] = useState<string>('');
   const [note, setNote] = useState<string>(exercise.note ?? '');
 
-  // Swipe State
   const [translateX, setTranslateX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const startX = useRef<number>(0);
@@ -35,9 +33,7 @@ export const ExerciseCard: React.FC<Props> = ({ exercise, onLog, onDelete, onRen
     setNote(exercise.note ?? '');
   }, [exercise.note]);
 
-  // Touch Handlers
   const handleTouchStart = (e: React.TouchEvent) => {
-    // Prevent swipe if interacting with inputs
     const tagName = (e.target as HTMLElement).tagName;
     if (tagName === 'INPUT' || tagName === 'TEXTAREA') return;
     
@@ -60,12 +56,8 @@ export const ExerciseCard: React.FC<Props> = ({ exercise, onLog, onDelete, onRen
       setIsDragging(true);
     }
     
-    // Calculate new position
     let newX = startTranslate.current + diff;
     
-    // Clamp values
-    // Left swipe (Delete): up to -80
-    // Right swipe (Rename): up to 80
     if (newX < -80) newX = -80;
     if (newX > 80) newX = 80;
 
@@ -76,13 +68,12 @@ export const ExerciseCard: React.FC<Props> = ({ exercise, onLog, onDelete, onRen
     if (!isDragging) return;
     setIsDragging(false);
     
-    // Threshold to snap open/close
     if (translateX < -40) {
-      setTranslateX(-80); // Snap Delete
+      setTranslateX(-80);
     } else if (translateX > 40) {
-      setTranslateX(80); // Snap Rename
+      setTranslateX(80);
     } else {
-      setTranslateX(0); // Snap Closed
+      setTranslateX(0);
     }
   };
 
@@ -114,7 +105,6 @@ export const ExerciseCard: React.FC<Props> = ({ exercise, onLog, onDelete, onRen
   return (
     <div className="relative mb-4 rounded-2xl bg-ios-bg overflow-hidden select-none">
       
-      {/* Background Actions Layer */}
       <div className="absolute inset-0 flex justify-between">
          {/* Left Action (Rename) - Revealed when swiping RIGHT */}
          <div className="bg-blue-500 w-[80px] flex items-center justify-center">
@@ -139,7 +129,6 @@ export const ExerciseCard: React.FC<Props> = ({ exercise, onLog, onDelete, onRen
          </div>
       </div>
 
-      {/* Foreground Card */}
       <div 
         className={`bg-ios-card relative z-10 p-4 transition-transform ${isDragging ? '' : 'duration-300 ease-out'} touch-pan-y`}
         style={{ transform: `translateX(${translateX}px)` }}
@@ -151,7 +140,7 @@ export const ExerciseCard: React.FC<Props> = ({ exercise, onLog, onDelete, onRen
             className="flex justify-between items-center cursor-pointer"
             onClick={() => {
                 if (translateX === 0) setIsExpanded(!isExpanded);
-                else setTranslateX(0); // Tap to close swipe
+                else setTranslateX(0);
             }}
         >
             <div className="flex-1">

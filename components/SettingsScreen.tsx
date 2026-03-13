@@ -39,13 +39,11 @@ export const SettingsScreen: React.FC<Props> = ({ onExport, onImport }) => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold text-ios-text">{t.labels.settings}</h1>
         <p className="text-sm text-ios-gray mt-2">{t.labels.settingsDesc || 'Manage your data and backup'}</p>
       </div>
 
-      {/* Settings Options */}
       <div className="space-y-3">
         <button
           onClick={onExport}
@@ -77,7 +75,6 @@ export const SettingsScreen: React.FC<Props> = ({ onExport, onImport }) => {
           </div>
         </button>
 
-        {/* Hidden File Input */}
         <input
           type="file"
           ref={fileInputRef}
@@ -86,7 +83,6 @@ export const SettingsScreen: React.FC<Props> = ({ onExport, onImport }) => {
           className="hidden"
         />
 
-        {/* Status Messages */}
         {importStatus === 'success' && (
           <div className="flex items-center gap-2 justify-center text-green-600 dark:text-green-400 pt-2 animate-fadeIn">
             <CheckCircle2 size={16} />
@@ -101,7 +97,6 @@ export const SettingsScreen: React.FC<Props> = ({ onExport, onImport }) => {
         )}
       </div>
 
-      {/* Info Section */}
       <div className="pt-6 border-t border-ios-separator">
         <p className="text-xs text-ios-gray text-center leading-relaxed">
           {t.labels.settingsInfo || 'Your data is stored locally on your device. Use backup to transfer your data to another device.'}

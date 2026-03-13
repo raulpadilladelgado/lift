@@ -12,6 +12,12 @@ export interface Exercise {
   note?: string;
 }
 
+export interface Routine {
+  id: string;
+  name: string;
+  exerciseIds: string[];
+}
+
 export type GroupSortField = 'progress' | 'weight';
 export type SortDirection = 'asc' | 'desc';
 
@@ -29,14 +35,13 @@ export interface StorageManagerInterface {
   updateExerciseNote(id: string, note: string): void;
   updateExerciseLog(exerciseId: string, originalDate: string, log: ExerciseLog): void;
   deleteExerciseLog(exerciseId: string, date: string): void;
-  
-  // Muscle Group Management
   getMuscleGroups(): string[];
   addMuscleGroup(group: string): void;
   deleteMuscleGroup(group: string): void;
   renameMuscleGroup(oldName: string, newName: string): void;
-
-  // Preferences
   getGroupSortPreference(): GroupSortPreference;
   saveGroupSortPreference(preference: GroupSortPreference): void;
+  getRoutines(): Routine[];
+  saveRoutine(routine: Routine): void;
+  deleteRoutine(id: string): void;
 }

@@ -6,6 +6,8 @@ interface Props {
   exercises: Exercise[];
   onUpdateLog: (exerciseId: string, originalDate: string, log: ExerciseLog) => void;
   onDeleteLog: (exerciseId: string, date: string) => void;
+  onDeleteAllLogs: (exerciseId: string) => void;
+  onDeleteAllLogsExceptLatest: (exerciseId: string) => void;
 }
 
 interface EditableLog {
@@ -15,7 +17,7 @@ interface EditableLog {
   reps: string;
 }
 
-export const HistoryScreen: React.FC<Props> = ({ exercises, onUpdateLog, onDeleteLog }) => {
+export const HistoryScreen: React.FC<Props> = ({ exercises, onUpdateLog, onDeleteLog, onDeleteAllLogs, onDeleteAllLogsExceptLatest }) => {
   const [selectedExerciseId, setSelectedExerciseId] = useState<string | null>(null);
   const [editableLogs, setEditableLogs] = useState<EditableLog[]>([]);
 
@@ -88,6 +90,18 @@ export const HistoryScreen: React.FC<Props> = ({ exercises, onUpdateLog, onDelet
     onDeleteLog(selectedExercise.id, log.originalDate);
   };
 
+  const handleDeleteAllLogs = () => {
+    if (!selectedExercise) return;
+    if (!window.confirm(t.prompts.confirmDeleteAll)) return;
+    onDeleteAllLogs(selectedExercise.id);
+  };
+
+  const handleDeleteAllLogsExceptLatest = () => {
+    if (!selectedExercise) return;
+    if (!window.confirm(t.prompts.confirmDeleteAllExceptLatest)) return;
+    onDeleteAllLogsExceptLatest(selectedExercise.id);
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
@@ -143,6 +157,23 @@ export const HistoryScreen: React.FC<Props> = ({ exercises, onUpdateLog, onDelet
                 {t.actions.close}
               </button>
             </div>
+
+            {editableLogs.length > 0 && (
+              <div className="flex gap-2 mb-4">
+                <button
+                  onClick={handleDeleteAllLogsExceptLatest}
+                  className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-ios-bg text-orange-500 border border-orange-500/30 active:opacity-70"
+                >
+                  {t.actions.deleteAllExceptLatest}
+                </button>
+                <button
+                  onClick={handleDeleteAllLogs}
+                  className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-red-500/10 text-red-500 border border-red-500/30 active:opacity-70"
+                >
+                  {t.actions.deleteAll}
+                </button>
+              </div>
+            )}
 
             {editableLogs.length === 0 ? (
               <div className="text-center py-12 opacity-50">

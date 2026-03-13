@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { storageManager } from './services/storageService';
-import { Exercise, ExerciseLog, GroupSortPreference } from './types';
+import { Exercise, ExerciseLog, GroupSortPreference, Routine } from './types';
 import { ExerciseCard } from './components/ExerciseCard';
 import { MuscleGroupCard } from './components/MuscleGroupCard';
 import { SettingsScreen } from './components/SettingsScreen';
 import { InsightsScreen } from './components/InsightsScreen';
 import { HistoryScreen } from './components/HistoryScreen';
+import { RoutinesScreen } from './components/RoutinesScreen';
 import { BottomNav, ScreenType } from './components/BottomNav';
 import { t, translations } from './utils/translations';
 import { sortExercisesForGroup } from './utils/exerciseSorting';
@@ -19,12 +20,12 @@ import {
   MoreVertical
 } from 'lucide-react';
 
-const APP_LOGO_SRC =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='black'/%3E%3Cpath d='M160 100 h 100 v 260 h 150 v 100 h -250 z' fill='white'/%3E%3Cpath d='M130 100 h 20 v 80 h -20 z' fill='white'/%3E%3Cpath d='M420 370 h 20 v 80 h -20 z' fill='white'/%3E%3C/svg%3E";
+const APP_LOGO_SRC = '/lift.png';
 
 const App: React.FC = () => {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [muscleGroups, setMuscleGroups] = useState<string[]>([]);
+  const [routines, setRoutines] = useState<Routine[]>([]);
   const [groupSortPreference, setGroupSortPreference] = useState<GroupSortPreference>(
     () => storageManager.getGroupSortPreference()
   );
@@ -43,12 +44,12 @@ const App: React.FC = () => {
     setExercises(storageManager.getExercises());
     setMuscleGroups(storageManager.getMuscleGroups());
     setGroupSortPreference(storageManager.getGroupSortPreference());
+    setRoutines(storageManager.getRoutines());
   };
 
   useEffect(() => {
     loadData();
     
-    // Check if running as PWA
     const checkStandalone = () => {
       const isStandaloneQuery = window.matchMedia('(display-mode: standalone)').matches;
       const isIosStandalone = (window.navigator as any).standalone === true;
@@ -110,6 +111,26 @@ const App: React.FC = () => {
 
   const handleDeleteLog = (exerciseId: string, date: string) => {
     storageManager.deleteExerciseLog(exerciseId, date);
+    loadData();
+  };
+
+  const handleDeleteAllLogs = (exerciseId: string) => {
+    storageManager.deleteAllLogs(exerciseId);
+    loadData();
+  };
+
+  const handleDeleteAllLogsExceptLatest = (exerciseId: string) => {
+    storageManager.deleteAllLogsExceptLatest(exerciseId);
+    loadData();
+  };
+
+  const handleSaveRoutine = (routine: Routine) => {
+    storageManager.saveRoutine(routine);
+    loadData();
+  };
+
+  const handleDeleteRoutine = (id: string) => {
+    storageManager.deleteRoutine(id);
     loadData();
   };
 
@@ -222,10 +243,8 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen pb-24 px-4 sm:max-w-md sm:mx-auto">
       
-      {/* Dynamic Header */}
       <header className="pt-8 pb-6 sticky top-0 z-20 bg-ios-bg/95 backdrop-blur-md">
         {activeGroup ? (
-          // Navigation Header
           <div className="flex items-center justify-between">
             <button 
               onClick={() => setActiveGroup(null)}
@@ -241,7 +260,6 @@ const App: React.FC = () => {
             </div>
           </div>
         ) : (
-          // Main Dashboard Header
           <div className="grid grid-cols-3 items-center">
             <div />
             <div className="flex flex-col items-center text-center">
@@ -264,7 +282,6 @@ const App: React.FC = () => {
         )}
       </header>
 
-      {/* Main Content Area */}
       <main className="animate-slideUp pb-24">
         {currentScreen === 'settings' ? (
           <SettingsScreen onExport={handleExport} onImport={handleImportData} />
@@ -275,9 +292,18 @@ const App: React.FC = () => {
             exercises={exercises}
             onUpdateLog={handleUpdateLog}
             onDeleteLog={handleDeleteLog}
+            onDeleteAllLogs={handleDeleteAllLogs}
+            onDeleteAllLogsExceptLatest={handleDeleteAllLogsExceptLatest}
+          />
+        ) : currentScreen === 'routines' ? (
+          <RoutinesScreen
+            routines={routines}
+            exercises={exercises}
+            onSaveRoutine={handleSaveRoutine}
+            onDeleteRoutine={handleDeleteRoutine}
+            onLogExercise={handleLog}
           />
         ) : activeGroup ? (
-          // Detail View: List of Exercises
           <div className="space-y-4">
             {currentViewExercises.length > 0 && (
               <div className="bg-ios-card rounded-2xl p-3 flex items-center justify-between gap-2">
@@ -331,7 +357,6 @@ const App: React.FC = () => {
             )}
           </div>
         ) : (
-          // Home View: Muscle Group Cards
           <div className="flex flex-col gap-4">
             {muscleGroups.map((group) => (
                <MuscleGroupCard
@@ -344,7 +369,6 @@ const App: React.FC = () => {
                />
             ))}
             
-            {/* Add Group Button */}
             <button 
               onClick={handleAddGroup}
               className="mt-2 py-4 border-2 border-dashed border-ios-separator rounded-2xl flex items-center justify-center text-ios-gray font-medium active:bg-gray-100 dark:active:bg-gray-800 transition-colors"
@@ -356,7 +380,6 @@ const App: React.FC = () => {
         )}
       </main>
 
-      {/* Add Exercise Modal */}
       {isAdding && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-ios-card w-full max-w-md rounded-2xl p-6 shadow-2xl mb-4 animate-slideUp max-h-[85vh] overflow-y-auto">
@@ -410,14 +433,12 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Edit Exercise Modal (Move & Rename) */}
       {editingExercise && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-ios-card w-full max-w-md rounded-2xl p-6 shadow-2xl animate-scaleIn">
             <h2 className="text-xl font-bold mb-4 text-ios-text">{t.labels.editExercise}</h2>
             <form onSubmit={handleSaveEdit}>
                 
-                {/* Name Edit with Icon */}
                 <label className="block text-xs font-medium text-ios-gray mb-1 ml-1">{t.labels.name}</label>
                 <div className="relative mb-4">
                     <input
@@ -429,7 +450,6 @@ const App: React.FC = () => {
                     <Pencil className="absolute right-4 top-1/2 -translate-y-1/2 text-ios-gray" size={18} />
                 </div>
 
-                {/* Muscle Group Edit */}
                 <label className="block text-xs font-medium text-ios-gray mb-2 ml-1">{t.labels.muscleGroup}</label>
                 <div className="grid grid-cols-3 gap-2 mb-6 max-h-[40vh] overflow-y-auto">
                     {muscleGroups.map(group => (
@@ -470,7 +490,6 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Install Tutorial Modal */}
       {isInstallModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-6">
           <div className="bg-ios-card w-full max-w-sm rounded-2xl p-6 shadow-2xl animate-scaleIn max-h-[80vh] overflow-y-auto">
@@ -478,7 +497,6 @@ const App: React.FC = () => {
             
             <div className="space-y-6">
               
-              {/* Safari iOS */}
               <div className="space-y-2">
                 <h3 className="font-semibold text-ios-text text-sm uppercase tracking-wide opacity-80">{t.labels.installIosSafari}</h3>
                 <div className="bg-ios-bg p-4 rounded-xl space-y-3">
@@ -497,8 +515,7 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-               {/* Chrome iOS */}
-              <div className="space-y-2">
+               <div className="space-y-2">
                 <h3 className="font-semibold text-ios-text text-sm uppercase tracking-wide opacity-80">{t.labels.installIosChrome}</h3>
                 <div className="bg-ios-bg p-4 rounded-xl space-y-3">
                    <div className="flex items-center gap-3">
@@ -516,7 +533,6 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              {/* Chrome Android */}
               <div className="space-y-2">
                 <h3 className="font-semibold text-ios-text text-sm uppercase tracking-wide opacity-80">{t.labels.installAndroid}</h3>
                 <div className="bg-ios-bg p-4 rounded-xl space-y-3">
@@ -546,7 +562,6 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* FAB - Only show on home screen */}
       {currentScreen === 'home' && (
         <button
           onClick={() => setIsAdding(true)}
@@ -557,7 +572,6 @@ const App: React.FC = () => {
         </button>
       )}
 
-      {/* Bottom Navigation */}
       <BottomNav currentScreen={currentScreen} onScreenChange={setCurrentScreen} />
     </div>
   );

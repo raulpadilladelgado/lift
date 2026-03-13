@@ -1,8 +1,8 @@
 import React from 'react';
-import { Home, BarChart3, Settings, History } from 'lucide-react';
+import { Home, BarChart3, Settings, History, ListChecks } from 'lucide-react';
 import { t } from '../utils/translations';
 
-export type ScreenType = 'home' | 'insights' | 'settings' | 'history';
+export type ScreenType = 'home' | 'insights' | 'history' | 'routines' | 'settings';
 
 interface Props {
   currentScreen: ScreenType;
@@ -11,20 +11,24 @@ interface Props {
 
 export const BottomNav: React.FC<Props> = ({ currentScreen, onScreenChange }) => {
   const navItems: { id: ScreenType; label: string; icon: React.ReactNode }[] = [
-    { id: 'home', label: t.labels.home || 'Home', icon: <Home size={24} /> },
-    { id: 'insights', label: t.labels.insights || 'Insights', icon: <BarChart3 size={24} /> },
-    { id: 'history', label: t.labels.history || 'History', icon: <History size={24} /> },
-    { id: 'settings', label: t.labels.settings || 'Settings', icon: <Settings size={24} /> },
+    { id: 'home', label: t.labels.home || 'Home', icon: <Home size={22} /> },
+    { id: 'insights', label: t.labels.insights || 'Insights', icon: <BarChart3 size={22} /> },
+    { id: 'history', label: t.labels.history || 'History', icon: <History size={22} /> },
+    { id: 'routines', label: t.labels.routines || 'Routines', icon: <ListChecks size={22} /> },
+    { id: 'settings', label: t.labels.settings || 'Settings', icon: <Settings size={22} /> },
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-ios-card/95 backdrop-blur-md border-t border-ios-separator z-30">
-      <div className="flex justify-around max-w-md mx-auto sm:max-w-md">
+    <nav
+      className="fixed bottom-0 left-0 right-0 bg-ios-card/95 backdrop-blur-md border-t border-ios-separator z-30"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
+      <div className="flex justify-around max-w-lg mx-auto">
         {navItems.map((item) => (
           <button
             key={item.id}
             onClick={() => onScreenChange(item.id)}
-            className={`flex-1 flex flex-col items-center justify-center py-3 gap-1.5 transition-colors active:opacity-70 ${
+            className={`flex-1 flex flex-col items-center justify-center py-2.5 gap-1 transition-colors active:opacity-70 ${
               currentScreen === item.id
                 ? 'text-ios-blue'
                 : 'text-ios-gray hover:text-ios-text'
@@ -32,9 +36,9 @@ export const BottomNav: React.FC<Props> = ({ currentScreen, onScreenChange }) =>
             aria-label={item.label}
           >
             <div className="w-6 h-6 flex items-center justify-center">{item.icon}</div>
-            <span className="text-xs font-semibold text-center leading-none truncate">{item.label}</span>
+            <span className="text-[10px] font-semibold text-center leading-none truncate">{item.label}</span>
             {currentScreen === item.id && (
-              <div className="h-0.5 w-8 bg-ios-blue rounded-full mt-0.5"></div>
+              <div className="h-0.5 w-6 bg-ios-blue rounded-full"></div>
             )}
           </button>
         ))}

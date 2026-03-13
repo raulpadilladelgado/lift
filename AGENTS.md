@@ -18,6 +18,11 @@ This project is a PWA focused on **absolute simplicity** and **human maintainabi
 ### 1. Simplicity and Maintainability (KISS)
 - **Simple Solutions:** Do not install external dependencies if it can be solved with native Web APIs or a simple Hook.
 - **Readable Code:** Code should explain the "what" by itself. Comments should explain the "why".
+- **Comment Policy:**
+  - **Remove** any comment that narrates what the code does (section labels, inline code descriptions, JSX block labels like `{/* Header */}` or `// Form State`).
+  - **Keep** only comments that document a non-obvious decision that cannot be inferred from the code itself (e.g. a counterintuitive direction mapping, an HTML constraint workaround, a performance trade-off).
+  - **Language:** All surviving comments must be in English.
+  - When in doubt, delete the comment — if the code needs a comment to be understood, refactor the code first.
 - **Small Components:** Maximum 100-150 lines per file. If it grows, split following SOLID principles.
 
 ### 2. Clean Architecture & SOLID

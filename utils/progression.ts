@@ -3,8 +3,7 @@ import { Exercise } from '../types';
 import { t } from './translations';
 
 export const getLastProgressionDate = (logs: ExerciseLog[]): string | null => {
-  if (!logs || logs.length < 1) return null;
-  if (logs.length === 1) return logs[0].date;
+  if (!logs || logs.length < 2) return null;
 
   const sortedLogs = [...logs].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
@@ -12,12 +11,13 @@ export const getLastProgressionDate = (logs: ExerciseLog[]): string | null => {
     const current = sortedLogs[i];
     const previous = sortedLogs[i - 1];
 
-    if (current.weight !== previous.weight || current.reps !== previous.reps) {
+    // Only upward changes in weight or reps count as progression — decreases are ignored.
+    if (current.weight > previous.weight || current.reps > previous.reps) {
       return current.date;
     }
   }
 
-  return sortedLogs[sortedLogs.length - 1].date;
+  return null;
 };
 
 export const getLatestLog = (logs: ExerciseLog[]): ExerciseLog | null => {

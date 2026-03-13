@@ -1,9 +1,10 @@
-import { Exercise, ExerciseLog, GroupSortPreference, StorageManagerInterface } from '../types';
+import { Exercise, ExerciseLog, GroupSortPreference, Routine, StorageManagerInterface } from '../types';
 import { DEFAULT_GROUP_SORT_PREFERENCE } from '../utils/exerciseSorting';
 
 const STORAGE_KEY = 'lift_data_v1';
 const GROUPS_KEY = 'lift_groups_v1';
 const GROUP_SORT_KEY = 'lift_group_sort_v1';
+const ROUTINES_KEY = 'lift_routines_v1';
 
 const DEFAULT_GROUPS = [
   'Pecho',
@@ -126,6 +127,27 @@ class LocalStorageManager implements StorageManagerInterface {
     }
   }
 
+  deleteAllLogs(exerciseId: string): void {
+    const exercises = this.loadData();
+    const exercise = exercises.find((e) => e.id === exerciseId);
+    if (exercise) {
+      exercise.logs = [];
+      this.saveData(exercises);
+    }
+  }
+
+  deleteAllLogsExceptLatest(exerciseId: string): void {
+    const exercises = this.loadData();
+    const exercise = exercises.find((e) => e.id === exerciseId);
+    if (exercise && exercise.logs.length > 1) {
+      const sorted = [...exercise.logs].sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
+      exercise.logs = [sorted[0]];
+      this.saveData(exercises);
+    }
+  }
+
   getMuscleGroups(): string[] {
     const data = localStorage.getItem(GROUPS_KEY);
     if (data) {
@@ -195,7 +217,6 @@ class LocalStorageManager implements StorageManagerInterface {
         return parsed;
       }
     } catch {
-      // Ignore invalid data and fall back to default
     }
 
     return DEFAULT_GROUP_SORT_PREFERENCE;
@@ -205,7 +226,26 @@ class LocalStorageManager implements StorageManagerInterface {
     localStorage.setItem(GROUP_SORT_KEY, JSON.stringify(preference));
   }
 
-  // --- Backup Features ---
+  getRoutines(): Routine[] {
+    const data = localStorage.getItem(ROUTINES_KEY);
+    return data ? JSON.parse(data) : [];
+  }
+
+  saveRoutine(routine: Routine): void {
+    const routines = this.getRoutines();
+    const index = routines.findIndex((r) => r.id === routine.id);
+    if (index >= 0) {
+      routines[index] = routine;
+    } else {
+      routines.push(routine);
+    }
+    localStorage.setItem(ROUTINES_KEY, JSON.stringify(routines));
+  }
+
+  deleteRoutine(id: string): void {
+    const routines = this.getRoutines().filter((r) => r.id !== id);
+    localStorage.setItem(ROUTINES_KEY, JSON.stringify(routines));
+  }
 
   exportData(): string {
     const backup = {
