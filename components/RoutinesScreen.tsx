@@ -21,7 +21,7 @@ interface LogFormState {
 }
 
 const DEFAULT_SETS = 3;
-const DEFAULT_REPS = 10;
+const DEFAULT_REPS = '10';
 
 export const RoutinesScreen: React.FC<Props> = ({
   routines,
@@ -96,11 +96,17 @@ export const RoutinesScreen: React.FC<Props> = ({
     field: 'sets' | 'reps',
     value: string
   ) => {
-    const parsed = parseInt(value, 10);
-    const num = Number.isNaN(parsed) || parsed < 1 ? 1 : parsed;
-    setFormExercises((prev) =>
-      prev.map((re) => (re.exerciseId === exerciseId ? { ...re, [field]: num } : re))
-    );
+    if (field === 'reps') {
+      setFormExercises((prev) =>
+        prev.map((re) => (re.exerciseId === exerciseId ? { ...re, reps: value } : re))
+      );
+    } else {
+      const parsed = parseInt(value, 10);
+      const num = Number.isNaN(parsed) || parsed < 1 ? 1 : parsed;
+      setFormExercises((prev) =>
+        prev.map((re) => (re.exerciseId === exerciseId ? { ...re, [field]: num } : re))
+      );
+    }
   };
 
   const toggleDropset = (exerciseId: string) => {
@@ -375,14 +381,14 @@ export const RoutinesScreen: React.FC<Props> = ({
                                     {t.labels.reps}
                                   </label>
                                   <input
-                                    type="number"
+                                    type="text"
                                     inputMode="numeric"
                                     value={routineEx.reps}
                                     onChange={(e) =>
                                       updateFormExerciseField(exercise.id, 'reps', e.target.value)
                                     }
                                     className="w-full bg-ios-card text-ios-text p-2 rounded-lg border-none outline-none focus:ring-2 focus:ring-ios-blue text-sm text-center"
-                                    min={1}
+                                    placeholder="10"
                                   />
                                 </div>
                                 <div className="flex flex-col items-center">

@@ -26,12 +26,12 @@ const routines: Routine[] = [
   {
     id: 'r1',
     name: 'Push Day',
-    exercises: [{ exerciseId: 'ex1', sets: 3, reps: 10, dropset: false }],
+    exercises: [{ exerciseId: 'ex1', sets: 3, reps: '10', dropset: false }],
   },
   {
     id: 'r2',
     name: 'Leg Day',
-    exercises: [{ exerciseId: 'ex2', sets: 4, reps: 12, dropset: true }],
+    exercises: [{ exerciseId: 'ex2', sets: 4, reps: '12', dropset: true }],
   },
 ];
 
@@ -96,7 +96,7 @@ describe('RoutinesScreen', () => {
       expect(saved.name).toBe('My Routine');
       expect(saved.exercises[0].exerciseId).toBe('ex1');
       expect(saved.exercises[0].sets).toBe(3);
-      expect(saved.exercises[0].reps).toBe(10);
+      expect(saved.exercises[0].reps).toBe('10');
       expect(saved.exercises[0].dropset).toBe(false);
     });
   });

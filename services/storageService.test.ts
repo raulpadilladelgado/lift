@@ -25,7 +25,7 @@ describe('storageService — routines', () => {
     const routine: Routine = {
       id: 'r1',
       name: 'Push Day',
-      exercises: [{ exerciseId: 'ex1', sets: 3, reps: 10, dropset: false }],
+      exercises: [{ exerciseId: 'ex1', sets: 3, reps: '10', dropset: false }],
     };
     storageManager.saveRoutine(routine);
     const routines = storageManager.getRoutines();
@@ -38,7 +38,7 @@ describe('storageService — routines', () => {
     storageManager.saveRoutine({
       id: 'r2',
       name: 'Pull Day',
-      exercises: [{ exerciseId: 'ex1', sets: 3, reps: 10, dropset: false }],
+      exercises: [{ exerciseId: 'ex1', sets: 3, reps: '10', dropset: false }],
     });
     expect(storageManager.getRoutines()).toHaveLength(2);
   });
@@ -48,7 +48,7 @@ describe('storageService — routines', () => {
     storageManager.saveRoutine({
       id: 'r1',
       name: 'Push Day Updated',
-      exercises: [{ exerciseId: 'ex1', sets: 4, reps: 8, dropset: true }],
+      exercises: [{ exerciseId: 'ex1', sets: 4, reps: '8', dropset: true }],
     });
     const routines = storageManager.getRoutines();
     expect(routines).toHaveLength(1);
@@ -82,7 +82,7 @@ describe('storageService — routines', () => {
   // --- persistence ---
 
   it('persists routines across separate getRoutines calls', () => {
-    const ex = { exerciseId: 'ex1', sets: 3, reps: 10, dropset: false };
+    const ex = { exerciseId: 'ex1', sets: 3, reps: '10', dropset: false };
     storageManager.saveRoutine({ id: 'r1', name: 'Push Day', exercises: [ex] });
     expect(storageManager.getRoutines()).toEqual(storageManager.getRoutines());
     expect(storageManager.getRoutines()[0].exercises[0].exerciseId).toBe('ex1');
@@ -101,8 +101,21 @@ describe('storageService — routines', () => {
     expect(routines[0].exercises[0]).toEqual({
       exerciseId: 'ex1',
       sets: 3,
-      reps: 10,
+      reps: '10',
       dropset: false,
     });
+  });
+
+  it('migrates reps from number to string when loading old data', () => {
+    const oldFormat = JSON.stringify([
+      {
+        id: 'r1',
+        name: 'Push Day',
+        exercises: [{ exerciseId: 'ex1', sets: 3, reps: 10, dropset: false }],
+      },
+    ]);
+    localStorage.setItem('lift_routines_v1', oldFormat);
+    const routines = storageManager.getRoutines();
+    expect(routines[0].exercises[0].reps).toBe('10');
   });
 });

@@ -21,7 +21,11 @@ export const BottomNav: React.FC<Props> = ({ currentScreen, onScreenChange }) =>
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 bg-ios-card/95 backdrop-blur-md border-t border-ios-separator z-30"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      style={{
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        paddingLeft: 'env(safe-area-inset-left)',
+        paddingRight: 'env(safe-area-inset-right)',
+      }}
     >
       <div className="flex justify-around max-w-lg mx-auto">
         {navItems.map((item) => (

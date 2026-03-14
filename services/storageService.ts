@@ -1,5 +1,6 @@
 import { Exercise, ExerciseLog, GroupSortPreference, Routine, RoutineExercise, StorageManagerInterface } from '../types';
 import { DEFAULT_GROUP_SORT_PREFERENCE } from '../utils/exerciseSorting';
+import { getLanguage, translations } from '../utils/translations';
 
 const STORAGE_KEY = 'lift_data_v1';
 const GROUPS_KEY = 'lift_groups_v1';
@@ -9,7 +10,9 @@ const ROUTINES_KEY = 'lift_routines_v1';
 const DEFAULT_GROUPS = [
   'Pecho',
   'Espalda',
-  'Pierna',
+  'Cuádriceps',
+  'Femoral',
+  'Glúteo',
   'Hombro',
   'Bíceps',
   'Tríceps',
@@ -17,6 +20,53 @@ const DEFAULT_GROUPS = [
   'Cardio',
   'Otro'
 ];
+
+function buildSeedExercises(): Exercise[] {
+  const lang = getLanguage();
+  const names = translations[lang].seedExercises;
+  const seed: Array<{ key: keyof typeof names; group: string }> = [
+    { key: 'benchPress', group: 'Pecho' },
+    { key: 'inclinePress', group: 'Pecho' },
+    { key: 'chestFly', group: 'Pecho' },
+    { key: 'dips', group: 'Pecho' },
+    { key: 'latPulldown', group: 'Espalda' },
+    { key: 'barbellRow', group: 'Espalda' },
+    { key: 'deadlift', group: 'Espalda' },
+    { key: 'facePull', group: 'Espalda' },
+    { key: 'squat', group: 'Cuádriceps' },
+    { key: 'legPress', group: 'Cuádriceps' },
+    { key: 'legExtension', group: 'Cuádriceps' },
+    { key: 'legCurl', group: 'Femoral' },
+    { key: 'romanianDeadlift', group: 'Femoral' },
+    { key: 'goodMorning', group: 'Femoral' },
+    { key: 'hipThrust', group: 'Glúteo' },
+    { key: 'bulgarianSplitSquat', group: 'Glúteo' },
+    { key: 'gluteKickback', group: 'Glúteo' },
+    { key: 'militaryPress', group: 'Hombro' },
+    { key: 'lateralRaise', group: 'Hombro' },
+    { key: 'frontRaise', group: 'Hombro' },
+    { key: 'barbellCurl', group: 'Bíceps' },
+    { key: 'hammerCurl', group: 'Bíceps' },
+    { key: 'inclineCurl', group: 'Bíceps' },
+    { key: 'skullCrusher', group: 'Tríceps' },
+    { key: 'tricepPushdown', group: 'Tríceps' },
+    { key: 'tricepKickback', group: 'Tríceps' },
+    { key: 'crunch', group: 'Abdominales' },
+    { key: 'plank', group: 'Abdominales' },
+    { key: 'legRaise', group: 'Abdominales' },
+    { key: 'treadmill', group: 'Cardio' },
+    { key: 'bike', group: 'Cardio' },
+    { key: 'elliptical', group: 'Cardio' },
+    { key: 'cableWristCurl', group: 'Otro' },
+    { key: 'shrugs', group: 'Otro' },
+  ];
+  return seed.map(({ key, group }, index) => ({
+    id: `seed_${index}_${key}`,
+    name: names[key],
+    muscleGroup: group,
+    logs: [],
+  }));
+}
 
 class LocalStorageManager implements StorageManagerInterface {
   private loadData(): Exercise[] {
@@ -29,7 +79,14 @@ class LocalStorageManager implements StorageManagerInterface {
   }
 
   getExercises(): Exercise[] {
-    return this.loadData();
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (data) {
+      const parsed: Exercise[] = JSON.parse(data);
+      if (parsed.length > 0) return parsed;
+    }
+    const seed = buildSeedExercises();
+    this.saveData(seed);
+    return seed;
   }
 
   saveExercise(exercise: Exercise): void {
@@ -231,11 +288,17 @@ class LocalStorageManager implements StorageManagerInterface {
     if (!data) return [];
     const parsed = JSON.parse(data) as Array<Routine & { exerciseIds?: string[] }>;
     return parsed.map((r) => {
-      if (r.exercises) return r as Routine;
+      if (r.exercises) {
+        const migrated = r.exercises.map((re) => ({
+          ...re,
+          reps: typeof re.reps === 'number' ? String(re.reps) : re.reps,
+        }));
+        return { ...r, exercises: migrated } as Routine;
+      }
       const migrated: RoutineExercise[] = (r.exerciseIds ?? []).map((id) => ({
         exerciseId: id,
         sets: 3,
-        reps: 10,
+        reps: '10',
         dropset: false,
       }));
       return { id: r.id, name: r.name, exercises: migrated };

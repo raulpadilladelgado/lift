@@ -565,7 +565,8 @@ const App: React.FC = () => {
       {currentScreen === 'home' && (
         <button
           onClick={() => setIsAdding(true)}
-          className="fixed bottom-24 right-6 w-14 h-14 bg-ios-blue rounded-full shadow-lg shadow-blue-500/30 flex items-center justify-center text-white active:scale-95 transition-transform z-40"
+          className="fixed right-6 w-14 h-14 bg-ios-blue rounded-full shadow-lg shadow-blue-500/30 flex items-center justify-center text-white active:scale-95 transition-transform z-40"
+          style={{ bottom: 'calc(env(safe-area-inset-bottom) + 5rem)' }}
           aria-label={t.labels.newExercise}
         >
           <Plus size={28} strokeWidth={2.5} />
