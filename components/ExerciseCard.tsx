@@ -26,6 +26,8 @@ export const ExerciseCard: React.FC<Props> = ({ exercise, onLog, onDelete, onRen
 
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didLongPress = useRef(false);
+  const touchStartPos = useRef<{ x: number; y: number } | null>(null);
+  const isScrolling = useRef(false);
 
   useEffect(() => {
     setNote(exercise.note ?? '');
@@ -35,10 +37,17 @@ export const ExerciseCard: React.FC<Props> = ({ exercise, onLog, onDelete, onRen
     const target = e.target as HTMLElement;
     if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON') return;
 
+    if ('touches' in e) {
+      touchStartPos.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+    isScrolling.current = false;
     didLongPress.current = false;
+
     longPressTimer.current = setTimeout(() => {
-      didLongPress.current = true;
-      setShowActions(true);
+      if (!isScrolling.current) {
+        didLongPress.current = true;
+        setShowActions(true);
+      }
     }, LONG_PRESS_MS);
   }, []);
 
@@ -49,10 +58,21 @@ export const ExerciseCard: React.FC<Props> = ({ exercise, onLog, onDelete, onRen
     }
   }, []);
 
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!touchStartPos.current) return;
+    const dx = Math.abs(e.touches[0].clientX - touchStartPos.current.x);
+    const dy = Math.abs(e.touches[0].clientY - touchStartPos.current.y);
+    
+    if (dx > 10 || dy > 10) {
+      isScrolling.current = true;
+      cancelLongPress();
+    }
+  }, [cancelLongPress]);
+
   const handlePress = useCallback((e?: React.TouchEvent | React.MouseEvent) => {
     e?.preventDefault();
     cancelLongPress();
-    if (didLongPress.current) return;
+    if (didLongPress.current || isScrolling.current) return;
     setIsExpanded((prev) => !prev);
   }, [cancelLongPress]);
 
@@ -78,7 +98,7 @@ export const ExerciseCard: React.FC<Props> = ({ exercise, onLog, onDelete, onRen
           className="p-4 cursor-pointer"
           onTouchStart={startLongPress}
           onTouchEnd={handlePress}
-          onTouchMove={cancelLongPress}
+          onTouchMove={handleTouchMove}
           onMouseDown={startLongPress}
           onMouseUp={handlePress}
           onMouseLeave={cancelLongPress}

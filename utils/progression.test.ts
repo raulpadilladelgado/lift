@@ -52,10 +52,26 @@ describe('progression utilities', () => {
       expect(getLastProgressionDate(logs)).toBeNull();
     });
 
-    it('should NOT count a decrease in reps as progression', () => {
+    it('should NOT count a decrease in reps as progression if weight is same', () => {
       const logs: ExerciseLog[] = [
         { date: '2026-01-30', weight: 50, reps: 10 },
         { date: '2026-02-01', weight: 50, reps: 8 },
+      ];
+      expect(getLastProgressionDate(logs)).toBeNull();
+    });
+
+    it('should count an increase in weight as progression even if reps decrease', () => {
+      const logs: ExerciseLog[] = [
+        { date: '2026-01-30', weight: 50, reps: 10 },
+        { date: '2026-02-01', weight: 55, reps: 8 },
+      ];
+      expect(getLastProgressionDate(logs)).toBe('2026-02-01');
+    });
+
+    it('should NOT count an increase in reps as progression if weight decreases', () => {
+      const logs: ExerciseLog[] = [
+        { date: '2026-01-30', weight: 55, reps: 8 },
+        { date: '2026-02-01', weight: 50, reps: 10 },
       ];
       expect(getLastProgressionDate(logs)).toBeNull();
     });
@@ -155,11 +171,59 @@ describe('progression utilities', () => {
     it('should return empty array for no exercises', () => {
       expect(getRecentProgressions([])).toEqual([]);
     });
-
     it('should return empty array when exercises have no logs', () => {
       const exercises: Exercise[] = [
         { id: '1', name: 'Bench', muscleGroup: 'Pecho', logs: [] },
         { id: '2', name: 'Squat', muscleGroup: 'Pierna', logs: [] },
+      ];
+      expect(getRecentProgressions(exercises)).toEqual([]);
+    });
+
+    it('should include exercises with weight maintenance and reps increase', () => {
+      const exercises: Exercise[] = [
+        {
+          id: '1',
+          name: 'Bench',
+          muscleGroup: 'Pecho',
+          logs: [
+            { date: '2026-01-30', weight: 60, reps: 10 },
+            { date: '2026-02-01', weight: 60, reps: 12 },
+          ],
+        },
+      ];
+      const result = getRecentProgressions(exercises);
+      expect(result).toHaveLength(1);
+      expect(result[0].detail.type).toBe('reps');
+    });
+
+    it('should include exercises with weight increase and reps decrease', () => {
+      const exercises: Exercise[] = [
+        {
+          id: '1',
+          name: 'Bench',
+          muscleGroup: 'Pecho',
+          logs: [
+            { date: '2026-01-30', weight: 60, reps: 10 },
+            { date: '2026-02-01', weight: 65, reps: 8 },
+          ],
+        },
+      ];
+      const result = getRecentProgressions(exercises);
+      expect(result).toHaveLength(1);
+      expect(result[0].detail.type).toBe('weight');
+    });
+
+    it('should exclude exercises with weight decrease and reps increase', () => {
+      const exercises: Exercise[] = [
+        {
+          id: '1',
+          name: 'Bench',
+          muscleGroup: 'Pecho',
+          logs: [
+            { date: '2026-01-30', weight: 65, reps: 8 },
+            { date: '2026-02-01', weight: 60, reps: 10 },
+          ],
+        },
       ];
       expect(getRecentProgressions(exercises)).toEqual([]);
     });

@@ -11,8 +11,14 @@ export const getLastProgressionDate = (logs: ExerciseLog[]): string | null => {
     const current = sortedLogs[i];
     const previous = sortedLogs[i - 1];
 
-    // Only upward changes in weight or reps count as progression — decreases are ignored.
-    if (current.weight > previous.weight || current.reps > previous.reps) {
+    const weightUp = current.weight > previous.weight;
+    const repsUp = current.reps > previous.reps;
+    const weightEqual = current.weight === previous.weight;
+
+    // New Rules:
+    // 1. Weight UP (irrespective of reps)
+    // 2. Weight SAME and Reps UP
+    if (weightUp || (weightEqual && repsUp)) {
       return current.date;
     }
   }
@@ -42,9 +48,16 @@ export const getProgressionDetail = (logs: ExerciseLog[]): ProgressionDetail | n
 
     const weightUp = current.weight > previous.weight;
     const repsUp = current.reps > previous.reps;
+    const weightEqual = current.weight === previous.weight;
 
-    if (weightUp || repsUp) {
-      const type: ProgressionType = weightUp && repsUp ? 'both' : weightUp ? 'weight' : 'reps';
+    if (weightUp || (weightEqual && repsUp)) {
+      let type: ProgressionType = 'weight';
+      if (weightUp && repsUp) {
+        type = 'both';
+      } else if (weightEqual && repsUp) {
+        type = 'reps';
+      }
+
       return {
         type,
         timeSince: calculateTimeSince(current.date),

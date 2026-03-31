@@ -87,24 +87,39 @@ export const InsightsScreen: React.FC<Props> = ({ exercises }) => {
                               <span className="text-xs text-ios-gray flex-shrink-0 mt-1">{progression.progressionText}</span>
                             </div>
                             <div className="mt-3 flex flex-col gap-1.5">
-                              {(progression.detail.type === 'weight' || progression.detail.type === 'both') && (
-                                <div className="flex items-center gap-2">
-                                  <span className="text-xs text-ios-gray w-8">kg</span>
-                                  <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2.5 py-1 rounded-lg text-sm font-semibold">
+                              {/* Weight (Always Shown) */}
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-ios-gray w-10">kg</span>
+                                {progression.detail.currWeight > progression.detail.prevWeight ? (
+                                  <>
+                                    <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2.5 py-1 rounded-lg text-sm font-semibold">
+                                      {progression.detail.prevWeight} → {progression.detail.currWeight}
+                                    </div>
+                                    <span className="text-blue-500 text-sm font-bold">↑</span>
+                                  </>
+                                ) : (
+                                  <div className="bg-ios-bg text-ios-gray px-2.5 py-1 rounded-lg text-sm">
                                     {progression.detail.prevWeight} → {progression.detail.currWeight}
                                   </div>
-                                  <span className="text-blue-500 text-sm font-bold">↑</span>
-                                </div>
-                              )}
-                              {(progression.detail.type === 'reps' || progression.detail.type === 'both') && (
-                                <div className="flex items-center gap-2">
-                                  <span className="text-xs text-ios-gray w-8">reps</span>
-                                  <div className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2.5 py-1 rounded-lg text-sm font-semibold">
+                                )}
+                              </div>
+
+                              {/* Reps (Always Shown) */}
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-ios-gray w-10">reps</span>
+                                {progression.detail.currReps > progression.detail.prevReps ? (
+                                  <>
+                                    <div className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2.5 py-1 rounded-lg text-sm font-semibold">
+                                      {progression.detail.prevReps} → {progression.detail.currReps}
+                                    </div>
+                                    <span className="text-green-500 text-sm font-bold">↑</span>
+                                  </>
+                                ) : (
+                                  <div className="bg-ios-bg text-ios-gray px-2.5 py-1 rounded-lg text-sm">
                                     {progression.detail.prevReps} → {progression.detail.currReps}
                                   </div>
-                                  <span className="text-green-500 text-sm font-bold">↑</span>
-                                </div>
-                              )}
+                                )}
+                              </div>
                             </div>
                           </div>
                         ))}
