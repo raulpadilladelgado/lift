@@ -227,7 +227,7 @@ const App: React.FC = () => {
           </header>
         )}
 
-          <main className="animate-slideUp pb-24">
+          <main className="animate-slideUp px-4 pb-24">
           {currentScreen === 'settings' ? (
             <SettingsScreen onExport={handleExport} onImport={handleImportData} />
           ) : currentScreen === 'insights' ? (
@@ -258,7 +258,7 @@ const App: React.FC = () => {
               onDelete={() => { storageManager.deleteExercise(currentExercise.id); setSelectedExercise(null); loadData(); }}
             />
           ) : (
-            <div className="space-y-4 px-4 pt-4">
+            <div className="space-y-4 pt-4">
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <Button
                   onClick={() => { setNewExerciseName(''); setNewExerciseGroup(muscleGroups[0] ?? ''); setAddingExercise(true); }}
