@@ -5,20 +5,27 @@ interface Props {
   open: boolean;
   onClose: () => void;
   position?: 'center' | 'bottom';
+  labelledBy?: string;
   children: React.ReactNode;
 }
 
-export const Modal: React.FC<Props> = ({ open, onClose, position = 'center', children }) => {
+export const Modal: React.FC<Props> = ({ open, onClose, position = 'center', labelledBy, children }) => {
   const mountedAt = useRef(0);
 
   useEffect(() => {
     if (!open) return;
     mountedAt.current = Date.now();
     document.body.style.overflow = 'hidden';
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+
+    window.addEventListener('keydown', handleEscape);
     return () => {
       document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleEscape);
     };
-  }, [open]);
+  }, [open, onClose]);
 
   if (!open) return null;
 
@@ -27,17 +34,27 @@ export const Modal: React.FC<Props> = ({ open, onClose, position = 'center', chi
     if (e.target === e.currentTarget) onClose();
   };
 
-  const alignClass = position === 'bottom'
-    ? 'items-end justify-center'
-    : 'items-center justify-center';
+  const panelClass = position === 'bottom'
+    ? 'mx-3 w-[min(100%-1.5rem,42rem)] max-h-[calc(100dvh-1.5rem)]'
+    : 'mx-3 w-[min(100%-1.5rem,42rem)] max-h-[calc(100dvh-1.5rem)]';
 
   return createPortal(
     <div
-      className={`fixed inset-0 z-50 flex ${alignClass} bg-black/55 backdrop-blur-[2px]`}
+      role="presentation"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-3 backdrop-blur-[2px]"
       onClick={handleBackdrop}
       onTouchEnd={handleBackdrop}
     >
-      {children}
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={labelledBy}
+        className={`overflow-hidden rounded-3xl border border-app-border bg-app-surface shadow-2xl ${panelClass}`}
+        onClick={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
+      >
+        {children}
+      </div>
     </div>,
     document.body
   );

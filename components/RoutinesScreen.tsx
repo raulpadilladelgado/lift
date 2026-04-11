@@ -300,117 +300,127 @@ export const RoutinesScreen: React.FC<Props> = ({
       )}
 
       <Modal open={!!modalMode} onClose={closeModal} position="bottom">
-        <div className="flex w-full max-w-md flex-col rounded-t-3xl border border-app-border bg-app-surface" style={{ maxHeight: '85vh', paddingBottom: 'calc(env(safe-area-inset-bottom) + 1.5rem)' }} onClick={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()}>
-          <div className="flex flex-shrink-0 items-center justify-between px-6 pb-4 pt-6">
-            <h2 className="text-xl font-bold text-app-text">{modalMode === 'create' ? t.labels.newRoutine : t.labels.editRoutine}</h2>
-            <button onClick={closeModal} className="text-app-text-muted active:opacity-70"><X size={22} /></button>
+        <div className="flex max-h-[calc(100dvh-1.5rem)] w-full flex-col">
+          <div className="shrink-0 border-b border-app-border px-6 pb-4 pt-5">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-bold text-app-text">{modalMode === 'create' ? t.labels.newRoutine : t.labels.editRoutine}</h2>
+                <p className="mt-1 text-sm text-app-text-muted">{t.labels.selectExercises}</p>
+              </div>
+              <button onClick={closeModal} className="rounded-full border border-app-border p-2 text-app-text-muted active:opacity-70" aria-label={t.actions.cancel}>
+                <X size={18} />
+              </button>
+            </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-6">
-            <div className="mb-5">
-              <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-app-text-muted">{t.labels.routineName}</label>
-              <Input type="text" value={formName} onChange={(e) => setFormName(e.target.value)} placeholder={t.labels.routineName} autoFocus />
-            </div>
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-6 py-5">
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-app-text-muted">{t.labels.routineName}</label>
+                <Input type="text" value={formName} onChange={(e) => setFormName(e.target.value)} placeholder={t.labels.routineName} autoFocus />
+              </div>
 
-            <div className="mb-4">
-              <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-app-text-muted">{t.labels.selectExercises}</label>
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-app-text-muted">{t.labels.selectExercises}</label>
 
-              <SearchInput value={formSearch} onChange={(e) => setFormSearch(e.target.value)} onClear={() => setFormSearch('')} placeholder={t.labels.searchExercises} />
+                <SearchInput value={formSearch} onChange={(e) => setFormSearch(e.target.value)} onClear={() => setFormSearch('')} placeholder={t.labels.searchExercises} />
 
-              {filteredFormExercises.length === 0 ? (
-                <p className="py-4 text-center text-sm text-app-text-muted">{t.labels.noExercisesFound}</p>
-              ) : (
-                <div className="space-y-2 pb-2">
-                  {filteredFormExercises.map((exercise) => {
-                    const routineEx = formExercises.find((re) => re.exerciseId === exercise.id);
-                    const selected = routineEx !== undefined;
-                    return (
-                      <div key={exercise.id}>
-                        <button
-                          onClick={() => toggleExercise(exercise.id)}
-                          className={cn(
-                            'w-full rounded-xl border p-3 transition-colors active:opacity-70',
-                            selected ? 'border-app-accent bg-app-surface-muted' : 'border-app-border bg-app-surface'
-                          )}
-                        >
-                          <div className="text-left">
+                {filteredFormExercises.length === 0 ? (
+                  <p className="py-4 text-center text-sm text-app-text-muted">{t.labels.noExercisesFound}</p>
+                ) : (
+                  <div className="space-y-3 pb-2">
+                    {filteredFormExercises.map((exercise) => {
+                      const routineEx = formExercises.find((re) => re.exerciseId === exercise.id);
+                      const selected = routineEx !== undefined;
+                      return (
+                        <div key={exercise.id} className="space-y-2">
+                          <button
+                            onClick={() => toggleExercise(exercise.id)}
+                            className={cn(
+                              'w-full rounded-2xl border p-4 text-left transition-colors active:opacity-70',
+                              selected ? 'border-app-accent bg-app-surface-muted' : 'border-app-border bg-app-surface'
+                            )}
+                          >
                             <p className="text-sm font-semibold text-app-text">{exercise.name}</p>
                             <p className="mt-0.5 text-xs text-app-text-muted">{getTranslatedGroupName(exercise.muscleGroup)}</p>
-                          </div>
-                        </button>
+                          </button>
 
-                        {selected && routineEx && (
-                          <div className="mt-1 mb-1 rounded-xl border border-app-border bg-app-surface-muted px-3 py-3">
-                            <div className="mb-2 grid grid-cols-4 items-end gap-2">
-                              <div>
-                                <label className="mb-1 block text-xs font-medium text-app-text-muted">{t.labels.sets}</label>
-                                <Input compact type="text" inputMode="numeric" value={routineEx.sets} onChange={(e) => updateFormExerciseField(exercise.id, 'sets', e.target.value)} onBlur={(e) => commitSetsField(exercise.id, e.target.value)} className="text-center" />
-                              </div>
-                              <div>
-                                <label className="mb-1 block text-xs font-medium text-app-text-muted">{t.labels.reps}</label>
-                                <Input compact type="text" inputMode="text" value={routineEx.reps} onChange={(e) => updateFormExerciseField(exercise.id, 'reps', e.target.value)} disabled={routineEx.toFailure} className="text-center disabled:opacity-30" placeholder="10" />
-                              </div>
-                              <div className="flex flex-col items-center">
-                                <label className="mb-1 block text-xs font-medium text-app-text-muted">{t.labels.dropset}</label>
-                                <button onClick={() => toggleDropset(exercise.id)} className={cn('w-full rounded-lg border py-2 text-xs font-semibold transition-colors active:opacity-70', routineEx.dropset ? 'border-app-warning bg-app-warning text-app-text' : 'border-app-border bg-app-surface text-app-text-muted')}>
-                                  {routineEx.dropset ? '✓' : '—'}
-                                </button>
-                              </div>
-                              <div className="flex flex-col items-center">
-                                <label className="mb-1 block text-xs font-medium text-app-text-muted">{t.labels.toFailure}</label>
-                                <button onClick={() => toggleToFailure(exercise.id)} className={cn('w-full rounded-lg border py-2 text-xs font-semibold transition-colors active:opacity-70', routineEx.toFailure ? 'border-app-danger bg-app-danger text-white' : 'border-app-border bg-app-surface text-app-text-muted')}>
-                                  {routineEx.toFailure ? '✓' : '—'}
-                                </button>
-                              </div>
-                            </div>
-
-                            <div className="mt-1">
-                              {routineEx.alternativeExerciseId ? (
-                                <div className="flex items-center justify-between gap-3">
-                                  <p className="text-xs text-app-text-muted">
-                                    {t.labels.alternative}: <span className="font-semibold text-app-text">{exerciseById.get(routineEx.alternativeExerciseId)?.name ?? '—'}</span>
-                                  </p>
-                                  <button onClick={() => setAlternative(exercise.id, undefined)} className="text-xs text-app-danger active:opacity-70">{t.labels.clearAlternative}</button>
+                          {selected && routineEx && (
+                            <div className="rounded-2xl border border-app-border bg-app-surface-muted px-4 py-4">
+                              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                                <div className="space-y-1">
+                                  <label className="block text-xs font-medium text-app-text-muted">{t.labels.sets}</label>
+                                  <Input compact type="text" inputMode="numeric" value={routineEx.sets} onChange={(e) => updateFormExerciseField(exercise.id, 'sets', e.target.value)} onBlur={(e) => commitSetsField(exercise.id, e.target.value)} className="text-center" />
                                 </div>
-                              ) : (
-                                <button onClick={() => { setPickingAlternativeFor(exercise.id); setAlternativeSearch(''); }} className="flex items-center gap-1 text-xs text-app-text underline decoration-app-accent decoration-2 underline-offset-4 active:opacity-70">
-                                  <Shuffle size={12} />
-                                  {t.labels.setAlternative}
-                                </button>
-                              )}
+                                <div className="space-y-1">
+                                  <label className="block text-xs font-medium text-app-text-muted">{t.labels.reps}</label>
+                                  <Input compact type="text" inputMode="text" value={routineEx.reps} onChange={(e) => updateFormExerciseField(exercise.id, 'reps', e.target.value)} disabled={routineEx.toFailure} className="text-center disabled:opacity-30" placeholder="10" />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="block text-xs font-medium text-app-text-muted">{t.labels.dropset}</label>
+                                  <button onClick={() => toggleDropset(exercise.id)} className={cn('w-full rounded-xl border px-3 py-3 text-sm font-semibold transition-colors active:opacity-70', routineEx.dropset ? 'border-app-warning bg-app-warning text-app-text' : 'border-app-border bg-app-surface text-app-text-muted')}>
+                                    {routineEx.dropset ? 'Yes' : 'No'}
+                                  </button>
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="block text-xs font-medium text-app-text-muted">{t.labels.toFailure}</label>
+                                  <button onClick={() => toggleToFailure(exercise.id)} className={cn('w-full rounded-xl border px-3 py-3 text-sm font-semibold transition-colors active:opacity-70', routineEx.toFailure ? 'border-app-danger bg-app-danger text-white' : 'border-app-border bg-app-surface text-app-text-muted')}>
+                                    {routineEx.toFailure ? 'Yes' : 'No'}
+                                  </button>
+                                </div>
+                              </div>
+
+                              <div className="mt-4">
+                                {routineEx.alternativeExerciseId ? (
+                                  <div className="flex items-center justify-between gap-3">
+                                    <p className="text-xs text-app-text-muted">
+                                      {t.labels.alternative}: <span className="font-semibold text-app-text">{exerciseById.get(routineEx.alternativeExerciseId)?.name ?? '—'}</span>
+                                    </p>
+                                    <button onClick={() => setAlternative(exercise.id, undefined)} className="text-xs text-app-danger active:opacity-70">{t.labels.clearAlternative}</button>
+                                  </div>
+                                ) : (
+                                  <button onClick={() => { setPickingAlternativeFor(exercise.id); setAlternativeSearch(''); }} className="flex items-center gap-1 text-xs font-medium text-app-text underline decoration-app-accent decoration-2 underline-offset-4 active:opacity-70">
+                                    <Shuffle size={12} />
+                                    {t.labels.setAlternative}
+                                  </button>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="flex-shrink-0 border-t border-app-border px-6 pt-3">
+          <div className="shrink-0 border-t border-app-border px-6 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-4">
             <Button onClick={handleSave} disabled={!formName.trim()} className="w-full">{t.actions.save}</Button>
           </div>
         </div>
       </Modal>
 
       <Modal open={!!pickingAlternativeFor} onClose={() => setPickingAlternativeFor(null)} position="bottom">
-        <div className="w-full max-w-md rounded-t-3xl border border-app-border bg-app-surface p-6" style={{ maxHeight: '70vh', overflowY: 'auto', paddingBottom: 'calc(env(safe-area-inset-bottom) + 1.5rem)' }} onClick={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()}>
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-app-text">{t.labels.setAlternative}</h2>
-            <button onClick={() => setPickingAlternativeFor(null)} className="text-app-text-muted active:opacity-70"><X size={22} /></button>
+        <div className="flex max-h-[calc(100dvh-1.5rem)] w-full flex-col">
+          <div className="shrink-0 border-b border-app-border px-6 pb-4 pt-5">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-lg font-bold text-app-text">{t.labels.setAlternative}</h2>
+              <button onClick={() => setPickingAlternativeFor(null)} className="rounded-full border border-app-border p-2 text-app-text-muted active:opacity-70" aria-label={t.actions.cancel}><X size={18} /></button>
+            </div>
           </div>
-          <SearchInput value={alternativeSearch} onChange={(e) => setAlternativeSearch(e.target.value)} onClear={() => setAlternativeSearch('')} placeholder={t.labels.searchExercises} />
-          <div className="space-y-2">
-            {filteredAlternativeExercises.filter((ex) => ex.id !== pickingAlternativeFor).map((ex) => (
-              <button key={ex.id} onClick={() => { if (pickingAlternativeFor) setAlternative(pickingAlternativeFor, ex.id); setPickingAlternativeFor(null); }} className="w-full rounded-xl border border-app-border bg-app-surface p-3 text-left transition-colors active:bg-app-surface-muted">
-                <div>
+
+          <div className="flex-1 overflow-y-auto px-6 py-5">
+            <SearchInput value={alternativeSearch} onChange={(e) => setAlternativeSearch(e.target.value)} onClear={() => setAlternativeSearch('')} placeholder={t.labels.searchExercises} />
+            <div className="mt-4 space-y-2">
+              {filteredAlternativeExercises.filter((ex) => ex.id !== pickingAlternativeFor).map((ex) => (
+                <button key={ex.id} onClick={() => { if (pickingAlternativeFor) setAlternative(pickingAlternativeFor, ex.id); setPickingAlternativeFor(null); }} className="w-full rounded-2xl border border-app-border bg-app-surface p-4 text-left transition-colors active:bg-app-surface-muted">
                   <p className="text-sm font-semibold text-app-text">{ex.name}</p>
                   <p className="text-xs text-app-text-muted">{getTranslatedGroupName(ex.muscleGroup)}</p>
-                </div>
-              </button>
-            ))}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </Modal>

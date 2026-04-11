@@ -295,57 +295,64 @@ const App: React.FC = () => {
         <BottomNav currentScreen={currentScreen} onScreenChange={setCurrentScreen} onScreenReset={handleScreenReset} />
 
         <Modal open={addingExercise} onClose={() => setAddingExercise(false)} position="bottom">
-          <div
-            className="w-full max-w-md rounded-t-3xl border border-app-border bg-app-surface p-6 max-h-[85vh] overflow-y-auto animate-slideUp"
-            onClick={(e) => e.stopPropagation()}
-            onTouchEnd={(e) => e.stopPropagation()}
-            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 1.5rem)' }}
-          >
-            <h2 className="mb-4 text-xl font-bold text-app-text">{t.labels.newExercise}</h2>
-            <form onSubmit={handleAddExercise}>
-              <label className="mb-1 ml-1 block text-xs font-medium text-app-text-muted">{t.labels.name}</label>
-              <Input
-                autoFocus
-                type="text"
-                placeholder="Ej. Bench Press"
-                value={newExerciseName}
-                onChange={(e) => setNewExerciseName(e.target.value)}
-                className="mb-4"
-              />
-              <label className="mb-2 ml-1 block text-xs font-medium text-app-text-muted">{t.labels.muscleGroup}</label>
-              <div className="grid grid-cols-3 gap-2 mb-6">
-                {muscleGroups.map((group) => (
-                  <button
-                    key={group}
-                    type="button"
-                    onClick={() => setNewExerciseGroup(group)}
-                    className={cn(
-                      'truncate rounded-lg border px-1 py-2 text-sm font-medium transition-colors',
-                      newExerciseGroup === group
-                        ? 'border-app-accent bg-app-accent text-app-accent-foreground'
-                        : 'border-app-border bg-app-surface text-app-text active:bg-app-surface-muted'
-                    )}
-                  >
-                    {getTranslatedGroupName(group)}
-                  </button>
-                ))}
+          <div className="flex max-h-[calc(100dvh-1.5rem)] w-full flex-col">
+            <div className="shrink-0 border-b border-app-border px-6 pb-4 pt-5">
+              <h2 className="text-xl font-bold text-app-text">{t.labels.newExercise}</h2>
+            </div>
+
+            <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleAddExercise}>
+              <div className="flex-1 space-y-5 overflow-y-auto px-6 py-5">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-app-text-muted">{t.labels.name}</label>
+                  <Input
+                    autoFocus
+                    type="text"
+                    placeholder="Ej. Bench Press"
+                    value={newExerciseName}
+                    onChange={(e) => setNewExerciseName(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <label className="block text-sm font-medium text-app-text-muted">{t.labels.muscleGroup}</label>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {muscleGroups.map((group) => (
+                      <button
+                        key={group}
+                        type="button"
+                        onClick={() => setNewExerciseGroup(group)}
+                        className={cn(
+                          'min-h-12 truncate rounded-2xl border px-3 py-3 text-sm font-medium transition-colors',
+                          newExerciseGroup === group
+                            ? 'border-app-accent bg-app-accent text-app-accent-foreground'
+                            : 'border-app-border bg-app-surface text-app-text active:bg-app-surface-muted'
+                        )}
+                      >
+                        {getTranslatedGroupName(group)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
-              <div className="sticky bottom-0 flex gap-3 bg-app-surface pt-2">
-                <Button
-                  type="button"
-                  onClick={() => setAddingExercise(false)}
-                  variant="secondary"
-                  className="flex-1"
-                >
-                  {t.actions.cancel}
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={!newExerciseName.trim()}
-                  className="flex-1"
-                >
-                  {t.actions.save}
-                </Button>
+
+              <div className="shrink-0 border-t border-app-border px-6 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-4">
+                <div className="flex gap-3">
+                  <Button
+                    type="button"
+                    onClick={() => setAddingExercise(false)}
+                    variant="secondary"
+                    className="flex-1"
+                  >
+                    {t.actions.cancel}
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={!newExerciseName.trim()}
+                    className="flex-1"
+                  >
+                    {t.actions.save}
+                  </Button>
+                </div>
               </div>
             </form>
           </div>

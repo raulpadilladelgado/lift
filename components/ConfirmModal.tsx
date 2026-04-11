@@ -1,7 +1,6 @@
 import { useTranslations } from '../utils/translations';
 import { Modal } from './Modal';
 import { Button } from './ui/Button';
-import { Surface } from './ui/Surface';
 
 interface Props {
   title: string;
@@ -23,25 +22,28 @@ export default function ConfirmModal({
   const t = useTranslations();
   return (
     <Modal open onClose={onCancel} position="bottom">
-      <Surface className="w-full max-w-md space-y-4 rounded-t-3xl p-6" onClick={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()}>
-        <h2 className="text-lg font-semibold text-app-text text-center">{title}</h2>
-        {message && (
-          <p className="text-sm text-app-text-muted text-center">{message}</p>
-        )}
-        <div className="flex flex-col gap-2 pt-2">
-          <Button
-            onClick={onConfirm}
-            data-testid="confirm-modal-confirm"
-            variant={destructive ? 'destructive' : 'primary'}
-            className="w-full"
-          >
-            {confirmLabel ?? t.actions.delete}
-          </Button>
-          <Button onClick={onCancel} variant="secondary" className="w-full">
-            {t.actions.cancel}
-          </Button>
+      <div className="flex max-h-[calc(100dvh-1.5rem)] w-full flex-col" aria-labelledby="confirm-modal-title">
+        <div className="shrink-0 border-b border-app-border px-6 pb-4 pt-5">
+          <h2 id="confirm-modal-title" className="text-lg font-semibold text-app-text">{title}</h2>
+          {message && <p className="mt-2 text-sm text-app-text-muted">{message}</p>}
         </div>
-      </Surface>
+
+        <div className="shrink-0 px-6 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-4">
+          <div className="flex gap-3">
+            <Button onClick={onCancel} variant="secondary" className="flex-1">
+              {t.actions.cancel}
+            </Button>
+            <Button
+              onClick={onConfirm}
+              data-testid="confirm-modal-confirm"
+              variant={destructive ? 'destructive' : 'primary'}
+              className="flex-1"
+            >
+              {confirmLabel ?? t.actions.delete}
+            </Button>
+          </div>
+        </div>
+      </div>
     </Modal>
   );
 }
