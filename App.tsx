@@ -70,6 +70,7 @@ const App: React.FC = () => {
   }, [loadData]);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (currentScreen !== 'home') {
       setSelectedExercise(null);
     }
@@ -228,7 +229,7 @@ const App: React.FC = () => {
           </header>
         )}
 
-          <main className="animate-slideUp px-4 pb-24">
+          <main className="animate-slideUp px-4 pb-24 pt-[env(safe-area-inset-top,1rem)]">
           {currentScreen === 'settings' ? (
             <SettingsScreen onExport={handleExport} onImport={handleImportData} />
           ) : currentScreen === 'insights' ? (

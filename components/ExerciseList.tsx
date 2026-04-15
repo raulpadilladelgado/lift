@@ -101,7 +101,7 @@ export const ExerciseList: React.FC<Props> = ({
         <button
           onClick={() => setActiveGroup(null)}
           className={cn(
-            'flex-shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors',
+            'flex-shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors select-none',
             activeGroup === null
               ? 'border-app-accent bg-app-accent text-app-accent-foreground'
               : 'border-app-border bg-app-surface text-app-text-muted active:bg-app-surface-muted'

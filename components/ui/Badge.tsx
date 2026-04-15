@@ -8,11 +8,11 @@ interface Props extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 const variantClasses: Record<BadgeVariant, string> = {
-  neutral: 'border border-app-border bg-app-surface-muted text-app-text-muted',
+  neutral: 'border border-transparent bg-app-accent text-app-accent-foreground',
   accent: 'border border-transparent bg-app-accent text-app-accent-foreground',
-  success: 'border border-app-success/30 bg-app-surface-muted text-app-success',
-  warning: 'border border-app-warning/30 bg-app-surface-muted text-app-warning',
-  danger: 'border border-app-danger/30 bg-app-surface-muted text-app-danger',
+  success: 'border border-transparent bg-app-success text-white',
+  warning: 'border border-transparent bg-app-warning text-white',
+  danger: 'border border-transparent bg-app-danger text-white',
 };
 
 export const Badge: React.FC<Props> = ({ variant = 'neutral', className, ...props }) => {

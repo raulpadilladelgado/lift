@@ -11,8 +11,8 @@ interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary: 'border border-transparent bg-app-accent text-app-accent-foreground',
-  secondary: 'border border-app-border bg-app-surface text-app-text',
-  ghost: 'border border-transparent bg-transparent text-app-text',
+  secondary: 'border border-app-border bg-app-surface text-app-text active:bg-app-surface-muted',
+  ghost: 'border border-transparent bg-transparent text-app-text active:bg-app-surface-muted',
   destructive: 'border border-transparent bg-app-danger text-white',
 };
 

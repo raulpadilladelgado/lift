@@ -77,6 +77,7 @@ export const RoutinesScreen: React.FC<Props> = ({
   const [pickingAlternativeFor, setPickingAlternativeFor] = useState<string | null>(null);
   const [alternativeSearch, setAlternativeSearch] = useState('');
   const [editingExerciseId, setEditingExerciseId] = useState<string | null>(null);
+  const [editingRoutineId, setEditingRoutineId] = useState<string | null>(null);
 
   useEffect(() => {
     setActiveRoutineId(null);
@@ -430,7 +431,7 @@ export const RoutinesScreen: React.FC<Props> = ({
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-6 py-5">
+          <div className="flex-1 overflow-y-auto px-6 py-5 pt-[env(safe-area-inset-top,1.25rem)]">
             <SearchInput value={alternativeSearch} onChange={(e) => setAlternativeSearch(e.target.value)} onClear={() => setAlternativeSearch('')} placeholder={t.labels.searchExercises} />
             <div className="mt-4 space-y-2">
               {filteredAlternativeExercises.filter((ex) => ex.id !== pickingAlternativeFor).map((ex) => (
@@ -450,7 +451,7 @@ export const RoutinesScreen: React.FC<Props> = ({
         <ActionSheet
           title={actionSheetExerciseName}
           actions={[
-            { label: t.actions.edit, onPress: () => { setEditingExerciseId(actionSheetExerciseId); setActionSheetExerciseId(null); } },
+            { label: t.actions.edit, onPress: () => { setEditingExerciseId(actionSheetExerciseId); setEditingRoutineId(activeRoutineId); setActionSheetExerciseId(null); } },
             ...(!isFirst ? [{ label: t.labels.moveUp, icon: <ArrowUp size={16} />, onPress: () => { handleMoveUp(actionSheetExerciseId); setActionSheetExerciseId(null); } }] : []),
             ...(!isLast ? [{ label: t.labels.moveDown, icon: <ArrowDown size={16} />, onPress: () => { handleMoveDown(actionSheetExerciseId); setActionSheetExerciseId(null); } }] : []),
             { label: t.labels.removeFromRoutine, destructive: true, onPress: () => { setConfirmRemoveExerciseId(actionSheetExerciseId); setActionSheetExerciseId(null); } },
@@ -467,41 +468,63 @@ export const RoutinesScreen: React.FC<Props> = ({
         <ConfirmModal title={t.labels.removeFromRoutine} confirmLabel={t.actions.delete} destructive onConfirm={() => handleRemoveExerciseFromRoutine(confirmRemoveExerciseId)} onCancel={() => setConfirmRemoveExerciseId(null)} />
       )}
 
-      <Modal open={!!editingExerciseId} onClose={() => setEditingExerciseId(null)} position="bottom">
-        {editingExerciseId && exercises.find((e) => e.id === editingExerciseId) && (
-          <ExerciseDetail
-            exercise={exercises.find((e) => e.id === editingExerciseId)!}
-            muscleGroups={muscleGroups}
-            onBack={() => setEditingExerciseId(null)}
-            onLog={(weight, reps) => {
-              onLogExercise(editingExerciseId, weight, reps);
-            }}
-            onUpdateNote={(note) => {
-              onUpdateNote(editingExerciseId, note);
-            }}
-            onUpdateLog={(originalDate, log) => {
-              onUpdateLog(editingExerciseId, originalDate, log);
-            }}
-            onDeleteLog={(date) => {
-              onDeleteLog(editingExerciseId, date);
-            }}
-            onDeleteAllLogs={() => {
-              onDeleteAllLogs(editingExerciseId);
-            }}
-            onDeleteAllLogsExceptLatest={() => {
-              onDeleteAllLogsExceptLatest(editingExerciseId);
-            }}
-            onRename={(name) => {
-              // This would need to be passed as a prop - for now we skip rename from routine context
-            }}
-            onChangeGroup={(group) => {
-              // This would need to be passed as a prop - for now we skip group change from routine context
-            }}
-            onDelete={() => {
-              onDeleteExercise(editingExerciseId);
-              setEditingExerciseId(null);
-            }}
-          />
+      <Modal open={!!editingExerciseId} onClose={() => { setEditingExerciseId(null); setEditingRoutineId(null); }} position="bottom">
+        {editingExerciseId && exercises.find((e) => e.id === editingExerciseId) && editingRoutineId && (
+          <div className="flex max-h-[calc(100dvh-1.5rem)] flex-col overflow-hidden">
+            <div className="overflow-y-auto px-6 py-6 pt-[env(safe-area-inset-top,1.5rem)] pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
+              {(() => {
+                const routine = routines.find((r) => r.id === editingRoutineId);
+                const routineExercise = routine?.exercises.find((re) => re.exerciseId === editingExerciseId);
+                return (
+                  <ExerciseDetail
+                    exercise={exercises.find((e) => e.id === editingExerciseId)!}
+                    muscleGroups={muscleGroups}
+                    routineExercise={routineExercise ? { sets: routineExercise.sets, reps: routineExercise.reps, dropset: routineExercise.dropset, toFailure: routineExercise.toFailure } : undefined}
+                    onBack={() => { setEditingExerciseId(null); setEditingRoutineId(null); }}
+                    onLog={(weight, reps) => {
+                      onLogExercise(editingExerciseId, weight, reps);
+                    }}
+                    onUpdateNote={(note) => {
+                      onUpdateNote(editingExerciseId, note);
+                    }}
+                    onUpdateLog={(originalDate, log) => {
+                      onUpdateLog(editingExerciseId, originalDate, log);
+                    }}
+                    onDeleteLog={(date) => {
+                      onDeleteLog(editingExerciseId, date);
+                    }}
+                    onDeleteAllLogs={() => {
+                      onDeleteAllLogs(editingExerciseId);
+                    }}
+                    onDeleteAllLogsExceptLatest={() => {
+                      onDeleteAllLogsExceptLatest(editingExerciseId);
+                    }}
+                    onRename={(name) => {
+                      // This would need to be passed as a prop - for now we skip rename from routine context
+                    }}
+                    onChangeGroup={(group) => {
+                      // This would need to be passed as a prop - for now we skip group change from routine context
+                    }}
+                    onDelete={() => {
+                      onDeleteExercise(editingExerciseId);
+                      setEditingExerciseId(null);
+                    }}
+                    onUpdateRoutineExercise={(settings) => {
+                      if (routine && routineExercise) {
+                        const updatedRoutine = {
+                          ...routine,
+                          exercises: routine.exercises.map((re) =>
+                            re.exerciseId === editingExerciseId ? { ...re, sets: settings.sets, reps: settings.reps, dropset: settings.dropset, toFailure: settings.toFailure } : re
+                          ),
+                        };
+                        onSaveRoutine(updatedRoutine);
+                      }
+                    }}
+                  />
+                );
+              })()}
+            </div>
+          </div>
         )}
       </Modal>
     </div>

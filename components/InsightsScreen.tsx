@@ -72,7 +72,9 @@ export const InsightsScreen: React.FC<Props> = ({ exercises }) => {
                 <h3 className="truncate text-base font-semibold text-app-text">{progression.exerciseName}</h3>
                 <p className="mt-0.5 text-xs uppercase tracking-wide text-app-text-muted">{getTranslatedGroupName(progression.muscleGroup)}</p>
               </div>
-              <span className="flex-shrink-0 text-xs text-app-text-muted">{progression.progressionText}</span>
+              <Badge variant="accent" className="flex-shrink-0 whitespace-nowrap px-3 py-1.5 text-xs">
+                {progression.progressionText}
+              </Badge>
             </div>
              <div className="mt-3 flex flex-col gap-1.5">
                {renderProgressMetric('kg', progression.detail.prevWeight, progression.detail.currWeight)}

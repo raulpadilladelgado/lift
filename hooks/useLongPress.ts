@@ -1,7 +1,7 @@
 import React, { useRef, useCallback } from 'react';
 
 const DEFAULT_DELAY = 500;
-const SCROLL_THRESHOLD = 10;
+const SCROLL_THRESHOLD = 5;
 
 interface Options {
   onLongPress: () => void;
@@ -12,7 +12,7 @@ interface Options {
 interface LongPressHandlers {
   onMouseDown: (e: React.MouseEvent) => void;
   onMouseUp: (e: React.MouseEvent) => void;
-  onMouseLeave: () => void;
+  onMouseLeave: (e: React.MouseEvent) => void;
   onTouchStart: (e: React.TouchEvent) => void;
   onTouchEnd: (e: React.TouchEvent) => void;
   onTouchMove: (e: React.TouchEvent) => void;
@@ -27,11 +27,14 @@ export function useLongPress({ onLongPress, onTap, delay = DEFAULT_DELAY }: Opti
   const start = useCallback(
     (e: React.TouchEvent | React.MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON') return;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
 
       if ('touches' in e) {
         touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      } else {
+        touchStart.current = { x: (e as React.MouseEvent).clientX, y: (e as React.MouseEvent).clientY };
       }
+
       isScrolling.current = false;
       didLongPress.current = false;
 
@@ -58,9 +61,10 @@ export function useLongPress({ onLongPress, onTap, delay = DEFAULT_DELAY }: Opti
       if (!didLongPress.current && !isScrolling.current) {
         onTap?.();
       } else if (didLongPress.current) {
-        // Prevent the synthetic click that follows touchEnd after a long-press
         e.preventDefault();
+        e.stopPropagation();
       }
+      touchStart.current = null;
     },
     [cancel, onTap]
   );
@@ -81,7 +85,7 @@ export function useLongPress({ onLongPress, onTap, delay = DEFAULT_DELAY }: Opti
   return {
     onMouseDown: start as (e: React.MouseEvent) => void,
     onMouseUp: end as (e: React.MouseEvent) => void,
-    onMouseLeave: cancel,
+    onMouseLeave: end as (e: React.MouseEvent) => void,
     onTouchStart: start as (e: React.TouchEvent) => void,
     onTouchEnd: end as (e: React.TouchEvent) => void,
     onTouchMove,

@@ -5,13 +5,18 @@ import { useTranslations, getTranslatedGroupName } from '../utils/translations';
 import { getLatestLog } from '../utils/progression';
 import { useToast } from '../hooks/useToast';
 import ConfirmModal from './ConfirmModal';
-import { Modal } from './Modal';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 import { Surface } from './ui/Surface';
-import { Badge } from './ui/Badge';
 import { MuscleGroupPicker } from './ui/MuscleGroupPicker';
 import { cn } from '../utils/cn';
+
+interface RoutineExerciseSettings {
+  sets: number;
+  reps: string;
+  dropset: boolean;
+  toFailure: boolean;
+}
 
 interface Props {
   exercise: Exercise;
@@ -26,6 +31,8 @@ interface Props {
   onRename: (name: string) => void;
   onChangeGroup: (group: string) => void;
   onDelete: () => void;
+  routineExercise?: RoutineExerciseSettings;
+  onUpdateRoutineExercise?: (settings: RoutineExerciseSettings) => void;
 }
 
 interface EditableLog {
@@ -50,6 +57,8 @@ export const ExerciseDetail: React.FC<Props> = ({
   onRename,
   onChangeGroup,
   onDelete,
+  routineExercise,
+  onUpdateRoutineExercise,
 }) => {
   const { showToast } = useToast();
   const t = useTranslations();
@@ -64,7 +73,10 @@ export const ExerciseDetail: React.FC<Props> = ({
 
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState(exercise.name);
-  const [editingGroup, setEditingGroup] = useState(false);
+  const [showGroupPicker, setShowGroupPicker] = useState(false);
+
+  const [routineSets, setRoutineSets] = useState(routineExercise?.sets.toString() ?? '');
+  const [routineReps, setRoutineReps] = useState(routineExercise?.reps ?? '');
 
   useEffect(() => {
     setNote(exercise.note ?? '');
@@ -157,6 +169,27 @@ export const ExerciseDetail: React.FC<Props> = ({
     setEditingName(false);
   };
 
+  const handleRoutineSetsBlur = () => {
+    const sets = parseInt(routineSets, 10);
+    if (!routineExercise || Number.isNaN(sets) || sets < 1) return;
+    onUpdateRoutineExercise?.({ ...routineExercise, sets });
+  };
+
+  const handleRoutineRepsBlur = () => {
+    if (!routineExercise || !routineReps.trim()) return;
+    onUpdateRoutineExercise?.({ ...routineExercise, reps: routineReps });
+  };
+
+  const handleToggleDropset = () => {
+    if (!routineExercise) return;
+    onUpdateRoutineExercise?.({ ...routineExercise, dropset: !routineExercise.dropset });
+  };
+
+  const handleToggleToFailure = () => {
+    if (!routineExercise) return;
+    onUpdateRoutineExercise?.({ ...routineExercise, toFailure: !routineExercise.toFailure });
+  };
+
   const confirmConfigs: Record<ConfirmAction, { title: string; message?: string; label: string }> = {
     deleteLog: { title: t.prompts.confirmDelete, label: t.actions.delete },
     deleteAll: { title: t.actions.deleteAll, message: t.prompts.confirmDeleteAll, label: t.actions.deleteAll },
@@ -166,6 +199,67 @@ export const ExerciseDetail: React.FC<Props> = ({
 
   return (
     <div className="animate-fadeIn">
+      {routineExercise && (
+        <Surface className="mb-6">
+          <p className="mb-3 text-xs font-medium uppercase tracking-wide text-app-text-muted">{t.labels.routine ?? 'Routine'}</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-app-text-muted">{t.labels.sets}</label>
+              <Input
+                compact
+                type="text"
+                inputMode="numeric"
+                value={routineSets}
+                onChange={(e) => setRoutineSets(e.target.value)}
+                onBlur={handleRoutineSetsBlur}
+                className="text-center"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-app-text-muted">{t.labels.reps}</label>
+              <Input
+                compact
+                type="text"
+                inputMode="text"
+                value={routineReps}
+                onChange={(e) => setRoutineReps(e.target.value)}
+                onBlur={handleRoutineRepsBlur}
+                disabled={routineExercise.toFailure}
+                className="text-center disabled:opacity-30"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-app-text-muted">{t.labels.dropset}</label>
+              <button
+                onClick={handleToggleDropset}
+                className={cn(
+                  'w-full rounded-xl border px-3 py-3 text-sm font-semibold transition-colors active:opacity-70',
+                  routineExercise.dropset
+                    ? 'border-app-warning bg-app-warning text-white'
+                    : 'border-app-border bg-app-surface text-app-text-muted'
+                )}
+              >
+                {routineExercise.dropset ? 'Yes' : 'No'}
+              </button>
+            </div>
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-app-text-muted">{t.labels.toFailure}</label>
+              <button
+                onClick={handleToggleToFailure}
+                className={cn(
+                  'w-full rounded-xl border px-3 py-3 text-sm font-semibold transition-colors active:opacity-70',
+                  routineExercise.toFailure
+                    ? 'border-app-danger bg-app-danger text-white'
+                    : 'border-app-border bg-app-surface text-app-text-muted'
+                )}
+              >
+                {routineExercise.toFailure ? 'Yes' : 'No'}
+              </button>
+            </div>
+          </div>
+        </Surface>
+      )}
+
       <div className="flex items-center justify-between mb-6">
         <button
           onClick={onBack}
@@ -203,11 +297,24 @@ export const ExerciseDetail: React.FC<Props> = ({
         )}
 
         <button
-          onClick={() => setEditingGroup(true)}
+          onClick={() => setShowGroupPicker((v) => !v)}
           className="mt-1 text-sm text-app-text underline decoration-app-accent decoration-2 underline-offset-4 active:opacity-70"
         >
           {getTranslatedGroupName(exercise.muscleGroup)}
         </button>
+
+        {showGroupPicker && (
+          <div className="mt-3">
+            <MuscleGroupPicker
+              groups={muscleGroups}
+              selected={exercise.muscleGroup}
+              onSelect={(group) => {
+                onChangeGroup(group);
+                setShowGroupPicker(false);
+              }}
+            />
+          </div>
+        )}
       </div>
 
       <Surface className="mb-4">
@@ -273,81 +380,60 @@ export const ExerciseDetail: React.FC<Props> = ({
             </div>
           </div>
 
-          <div className="space-y-3">
-            {editableLogs.map((log, index) => (
-              <Surface key={log.originalDate}>
-                <div className="flex flex-col gap-3">
-                  <div>
-                    <label className="mb-1 block text-xs font-medium text-app-text-muted">{t.labels.date}</label>
-                    <Input
-                      type="date"
-                      value={log.date}
-                      onChange={(e) => handleLogChange(index, 'date', e.target.value)}
-                      onBlur={() => handleLogBlur(index)}
-                      compact
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-app-text-muted">{t.labels.weightShort}</label>
-                      <Input
-                        type="number"
-                        inputMode="decimal"
-                        value={log.weight}
-                        onChange={(e) => handleLogChange(index, 'weight', e.target.value)}
-                        onBlur={() => handleLogBlur(index)}
-                        compact
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-app-text-muted">{t.labels.reps}</label>
-                      <Input
-                        type="number"
-                        inputMode="numeric"
-                        value={log.reps}
-                        onChange={(e) => handleLogChange(index, 'reps', e.target.value)}
-                        onBlur={() => handleLogBlur(index)}
-                        compact
-                      />
-                    </div>
-                  </div>
+      <div className="space-y-3">
+        {editableLogs.map((log, index) => (
+          <Surface key={log.originalDate}>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <div className="sm:col-span-1">
+                <label className="mb-1 block text-xs font-medium text-app-text-muted">{t.labels.date}</label>
+                <Input
+                  type="date"
+                  value={log.date}
+                  onChange={(e) => handleLogChange(index, 'date', e.target.value)}
+                  onBlur={() => handleLogBlur(index)}
+                  compact
+                  className="w-full"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3 sm:col-span-2">
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-app-text-muted">{t.labels.weightShort}</label>
+                  <Input
+                    type="number"
+                    inputMode="decimal"
+                    value={log.weight}
+                    onChange={(e) => handleLogChange(index, 'weight', e.target.value)}
+                    onBlur={() => handleLogBlur(index)}
+                    compact
+                  />
                 </div>
-                <div className="mt-3 flex justify-end">
-                  <button
-                    onClick={() => setConfirmAction({ action: 'deleteLog', logIndex: index })}
-                    className="flex items-center gap-1 text-xs text-app-danger active:opacity-70"
-                  >
-                    <X size={12} />
-                    {t.actions.delete}
-                  </button>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-app-text-muted">{t.labels.reps}</label>
+                  <Input
+                    type="number"
+                    inputMode="numeric"
+                    value={log.reps}
+                    onChange={(e) => handleLogChange(index, 'reps', e.target.value)}
+                    onBlur={() => handleLogBlur(index)}
+                    compact
+                  />
                 </div>
-              </Surface>
-            ))}
-          </div>
+              </div>
+            </div>
+            <div className="mt-3 flex justify-end">
+              <button
+                onClick={() => setConfirmAction({ action: 'deleteLog', logIndex: index })}
+                className="flex items-center gap-1 text-xs text-app-danger active:opacity-70"
+              >
+                <X size={12} />
+                {t.actions.delete}
+              </button>
+            </div>
+          </Surface>
+        ))}
+      </div>
         </div>
       )}
-
-      <Modal open={editingGroup} onClose={() => setEditingGroup(false)} position="center">
-        <div
-          className="mx-4 w-full max-w-sm animate-scaleIn rounded-2xl border border-app-border bg-app-surface p-6"
-          onClick={(e) => e.stopPropagation()}
-          onTouchEnd={(e) => e.stopPropagation()}
-        >
-          <h2 className="mb-4 text-lg font-bold text-app-text">{t.labels.muscleGroup}</h2>
-          <MuscleGroupPicker
-            groups={muscleGroups}
-            selected={exercise.muscleGroup}
-            onSelect={(group) => {
-              onChangeGroup(group);
-              setEditingGroup(false);
-            }}
-            maxHeightClass="max-h-[50vh]"
-          />
-          <Button onClick={() => setEditingGroup(false)} variant="secondary" className="w-full mt-4">
-            {t.actions.cancel}
-          </Button>
-        </div>
-      </Modal>
 
       {confirmAction && (
         <ConfirmModal
