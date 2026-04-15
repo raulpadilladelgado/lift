@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ExerciseList } from './ExerciseList';
 import { Exercise } from '../types';
@@ -14,11 +14,19 @@ vi.mock('../utils/translations', async () => {
 });
 
 vi.mock('../hooks/useLongPress', () => ({
-  useLongPress: ({ onTap }: { onTap?: () => void }) => ({ onClick: onTap }),
+  useLongPress: ({ onTap, onLongPress }: { onTap?: () => void; onLongPress?: () => void }) => ({
+    onClick: onTap,
+    onMouseDown: onLongPress,
+    onMouseUp: onTap,
+    onMouseLeave: vi.fn(),
+    onTouchStart: onLongPress,
+    onTouchEnd: onTap,
+    onTouchMove: vi.fn(),
+  }),
 }));
 
 vi.mock('./ActionSheet', () => ({
-  ActionSheet: ({ title }: { title: string }) => <div>{title}</div>,
+  ActionSheet: ({ title }: { title: string }) => <div data-testid="action-sheet">{title}</div>,
 }));
 
 const exercises: Exercise[] = [
@@ -51,5 +59,45 @@ describe('ExerciseList', () => {
     expect(grid?.className).toContain('sm:grid-cols-2');
     expect(screen.getByText('Bench Press')).toBeTruthy();
     expect(screen.getByText('Squat')).toBeTruthy();
+  });
+
+  it('filters by selected muscle group', () => {
+    render(
+      <ExerciseList
+        exercises={exercises}
+        muscleGroups={['Pecho', 'Espalda']}
+        onSelectExercise={vi.fn()}
+        onRename={vi.fn()}
+        onDelete={vi.fn()}
+        onMove={vi.fn()}
+        onRenameGroup={vi.fn()}
+        onDeleteGroup={vi.fn()}
+      />
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Pecho' }));
+
+    expect(screen.getByText('Bench Press')).toBeTruthy();
+    expect(screen.queryByText('Deadlift')).toBeNull();
+    expect(screen.queryByText('Squat')).toBeNull();
+  });
+
+  it('opens group actions on long press', () => {
+    render(
+      <ExerciseList
+        exercises={exercises}
+        muscleGroups={['Pecho', 'Espalda']}
+        onSelectExercise={vi.fn()}
+        onRename={vi.fn()}
+        onDelete={vi.fn()}
+        onMove={vi.fn()}
+        onRenameGroup={vi.fn()}
+        onDeleteGroup={vi.fn()}
+      />
+    );
+
+    fireEvent.mouseDown(screen.getByRole('button', { name: 'Pecho' }));
+
+    expect(screen.getByTestId('action-sheet').textContent).toBe('Pecho');
   });
 });

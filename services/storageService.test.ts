@@ -129,4 +129,37 @@ describe('storageService — routines', () => {
     const routines = storageManager.getRoutines();
     expect(routines[0].exercises[0].reps).toBe('10');
   });
+
+  it('deletes exercises from a removed group and cleans routine references', () => {
+    storageManager.addMuscleGroup('Pecho');
+    storageManager.saveExercise({ id: 'ex-keep', name: 'Squat', muscleGroup: 'Pierna', logs: [] });
+    storageManager.saveExercise({ id: 'ex-main', name: 'Bench', muscleGroup: 'Pecho', logs: [] });
+    storageManager.saveExercise({ id: 'ex-alt', name: 'Fly', muscleGroup: 'Pecho', logs: [] });
+    storageManager.saveRoutine({
+      id: 'r1',
+      name: 'Test',
+      exercises: [
+        { exerciseId: 'ex-main', sets: 3, reps: '8', dropset: false, toFailure: false },
+        { exerciseId: 'ex-keep', alternativeExerciseId: 'ex-alt', sets: 3, reps: '10', dropset: false, toFailure: false },
+      ],
+    });
+
+    storageManager.deleteMuscleGroup('Pecho');
+
+    expect(storageManager.getExercises().map((exercise) => exercise.id)).toEqual(['ex-keep']);
+    expect(storageManager.getMuscleGroups()).not.toContain('Pecho');
+    expect(storageManager.getRoutines()[0].exercises).toEqual([
+      { exerciseId: 'ex-keep', sets: 3, reps: '10', dropset: false, toFailure: false },
+    ]);
+  });
+
+  it('only removes the group when it has no exercises', () => {
+    storageManager.addMuscleGroup('Movilidad');
+    storageManager.saveExercise({ id: 'ex-1', name: 'Plank', muscleGroup: 'Core', logs: [] });
+
+    storageManager.deleteMuscleGroup('Movilidad');
+
+    expect(storageManager.getExercises().map((exercise) => exercise.id)).toEqual(['ex-1']);
+    expect(storageManager.getMuscleGroups()).not.toContain('Movilidad');
+  });
 });

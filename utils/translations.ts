@@ -72,7 +72,7 @@ export const translations = {
     },
     prompts: {
       deleteExercise: '¿Eliminar "{name}"?',
-      deleteGroup: '¿Eliminar grupo "{name}"? Los ejercicios se moverán a "Otro".',
+      deleteGroup: '¿Eliminar grupo "{name}"? También se eliminarán sus ejercicios.',
       renameGroup: 'Nuevo nombre para el grupo:',
       renameExercise: 'Nuevo nombre para el ejercicio:',
       newGroupName: 'Nombre del nuevo grupo muscular:',
@@ -255,7 +255,7 @@ export const translations = {
     },
     prompts: {
       deleteExercise: 'Delete "{name}"?',
-      deleteGroup: 'Delete group "{name}"? Exercises will move to "Other".',
+      deleteGroup: 'Delete group "{name}"? Its exercises will also be deleted.',
       renameGroup: 'New name for group:',
       renameExercise: 'New name for exercise:',
       newGroupName: 'Name of the new muscle group:',

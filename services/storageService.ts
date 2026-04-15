@@ -285,14 +285,36 @@ class LocalStorageManager implements StorageManagerInterface {
     this.saveMuscleGroups(groups);
 
     const exercises = this.loadData();
-    let changed = false;
-    exercises.forEach(ex => {
-      if (ex.muscleGroup === group) {
-        ex.muscleGroup = 'Otro';
-        changed = true;
+    const removedExerciseIds = exercises
+      .filter((exercise) => exercise.muscleGroup === group)
+      .map((exercise) => exercise.id);
+    if (removedExerciseIds.length === 0) return;
+
+    this.saveData(exercises.filter((exercise) => exercise.muscleGroup !== group));
+
+    const removedIds = new Set(removedExerciseIds);
+    const routines = this.getRoutines();
+    let routinesChanged = false;
+    const cleanedRoutines = routines.map((routine) => {
+      const cleanedExercises = routine.exercises
+        .filter((routineExercise) => !removedIds.has(routineExercise.exerciseId))
+        .map((routineExercise) => {
+          if (routineExercise.alternativeExerciseId && removedIds.has(routineExercise.alternativeExerciseId)) {
+            routinesChanged = true;
+            return { ...routineExercise, alternativeExerciseId: undefined };
+          }
+          return routineExercise;
+        });
+
+      if (cleanedExercises.length !== routine.exercises.length) {
+        routinesChanged = true;
       }
+      return { ...routine, exercises: cleanedExercises };
     });
-    if (changed) this.saveData(exercises);
+
+    if (routinesChanged) {
+      localStorage.setItem(ROUTINES_KEY, JSON.stringify(cleanedRoutines));
+    }
   }
 
   renameMuscleGroup(oldName: string, newName: string): void {

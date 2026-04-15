@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Exercise } from '../types';
 import { useTranslations, getTranslatedGroupName } from '../utils/translations';
 import { useLongPress } from '../hooks/useLongPress';
@@ -43,10 +43,11 @@ const GroupChip: React.FC<{
   onTap: () => void;
   onLongPress: () => void;
 }> = ({ group, active, onTap, onLongPress }) => {
-  const { onTouchStart, onTouchEnd, onTouchMove, onMouseDown, onMouseUp, onMouseLeave } = useLongPress({ onTap, onLongPress });
+  const { onTouchStart, onTouchEnd, onTouchMove, onMouseDown, onMouseUp, onMouseLeave } = useLongPress({ onLongPress });
 
   return (
     <button
+      onClick={onTap}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
       onTouchMove={onTouchMove}
@@ -93,6 +94,12 @@ export const ExerciseList: React.FC<Props> = ({
     [exercises, activeGroup, search]
   );
 
+  useEffect(() => {
+    if (activeGroup && !muscleGroups.includes(activeGroup)) {
+      setActiveGroup(null);
+    }
+  }, [activeGroup, muscleGroups]);
+
   return (
     <div className="space-y-4">
       <SearchInput
@@ -101,6 +108,32 @@ export const ExerciseList: React.FC<Props> = ({
         onClear={() => setSearch('')}
         placeholder={t.labels.searchExercises}
       />
+
+      {muscleGroups.length > 0 && (
+        <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+          <button
+            onClick={() => setActiveGroup(null)}
+            className={cn(
+              'flex-shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors select-none',
+              activeGroup === null
+                ? 'border-app-accent bg-app-accent text-app-accent-foreground'
+                : 'border-app-border bg-app-surface text-app-text-muted active:bg-app-surface-muted'
+            )}
+          >
+            {t.labels.allGroups}
+          </button>
+
+          {muscleGroups.map((group) => (
+            <GroupChip
+              key={group}
+              group={group}
+              active={activeGroup === group}
+              onTap={() => setActiveGroup((current) => (current === group ? null : group))}
+              onLongPress={() => setActionGroup(group)}
+            />
+          ))}
+        </div>
+      )}
 
       {filtered.length === 0 ? (
         <div className="py-20 text-center opacity-60">
