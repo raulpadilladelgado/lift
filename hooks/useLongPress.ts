@@ -1,7 +1,7 @@
 import React, { useRef, useCallback } from 'react';
 
 const DEFAULT_DELAY = 500;
-const SCROLL_THRESHOLD = 5;
+const SCROLL_THRESHOLD = 15;
 
 interface Options {
   onLongPress: () => void;
@@ -58,11 +58,13 @@ export function useLongPress({ onLongPress, onTap, delay = DEFAULT_DELAY }: Opti
   const end = useCallback(
     (e: React.TouchEvent | React.MouseEvent) => {
       cancel();
-      if (!didLongPress.current && !isScrolling.current) {
-        onTap?.();
-      } else if (didLongPress.current) {
-        e.preventDefault();
-        e.stopPropagation();
+      if (!isScrolling.current) {
+        if (didLongPress.current) {
+          e.preventDefault();
+          e.stopPropagation();
+        } else {
+          onTap?.();
+        }
       }
       touchStart.current = null;
     },
@@ -85,7 +87,7 @@ export function useLongPress({ onLongPress, onTap, delay = DEFAULT_DELAY }: Opti
   return {
     onMouseDown: start as (e: React.MouseEvent) => void,
     onMouseUp: end as (e: React.MouseEvent) => void,
-    onMouseLeave: end as (e: React.MouseEvent) => void,
+    onMouseLeave: cancel as () => void,
     onTouchStart: start as (e: React.TouchEvent) => void,
     onTouchEnd: end as (e: React.TouchEvent) => void,
     onTouchMove,

@@ -3,6 +3,8 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import App from './App';
 
+vi.stubGlobal('scrollTo', vi.fn());
+
 vi.stubGlobal('matchMedia', () => ({
   matches: true,
   media: '',

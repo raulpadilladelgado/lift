@@ -1,6 +1,16 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { storageManager } from './storageService';
 import { Routine } from '../types';
+
+const mockStorage: Record<string, string> = {};
+vi.stubGlobal('localStorage', {
+  getItem: vi.fn((key: string) => mockStorage[key] || null),
+  setItem: vi.fn((key: string, value: string) => { mockStorage[key] = value; }),
+  removeItem: vi.fn((key: string) => { delete mockStorage[key]; }),
+  clear: vi.fn(() => { Object.keys(mockStorage).forEach(key => delete mockStorage[key]); }),
+  length: 0,
+  key: vi.fn((index: number) => Object.keys(mockStorage)[index] || null),
+});
 
 // storageService uses localStorage — jsdom provides it in the test env.
 

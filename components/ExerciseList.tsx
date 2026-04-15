@@ -43,11 +43,16 @@ const GroupChip: React.FC<{
   onTap: () => void;
   onLongPress: () => void;
 }> = ({ group, active, onTap, onLongPress }) => {
-  const handlers = useLongPress({ onTap, onLongPress });
+  const { onTouchStart, onTouchEnd, onTouchMove, onMouseDown, onMouseUp, onMouseLeave } = useLongPress({ onTap, onLongPress });
 
   return (
     <button
-      {...handlers}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      onTouchMove={onTouchMove}
+      onMouseDown={onMouseDown}
+      onMouseUp={onMouseUp}
+      onMouseLeave={onMouseLeave}
       className={cn(
         'flex-shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors select-none',
         active
@@ -96,29 +101,6 @@ export const ExerciseList: React.FC<Props> = ({
         onClear={() => setSearch('')}
         placeholder={t.labels.searchExercises}
       />
-
-      <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-        <button
-          onClick={() => setActiveGroup(null)}
-          className={cn(
-            'flex-shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors select-none',
-            activeGroup === null
-              ? 'border-app-accent bg-app-accent text-app-accent-foreground'
-              : 'border-app-border bg-app-surface text-app-text-muted active:bg-app-surface-muted'
-          )}
-        >
-          {t.labels.allGroups}
-        </button>
-        {muscleGroups.map((group) => (
-           <GroupChip
-             key={group}
-             group={group}
-             active={activeGroup === group}
-             onTap={() => setActiveGroup((prev) => prev === group ? null : group)}
-             onLongPress={() => setActionGroup(group)}
-           />
-        ))}
-      </div>
 
       {filtered.length === 0 ? (
         <div className="py-20 text-center opacity-60">

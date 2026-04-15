@@ -106,9 +106,6 @@ export const InsightsScreen: React.FC<Props> = ({ exercises }) => {
                   </div>
                 </div>
               </div>
-              <Badge variant="accent" className="flex-shrink-0 whitespace-nowrap px-3 py-1.5 text-xs">
-                {exercise.timeSince}
-              </Badge>
             </div>
           </ListRow>
         ))}
@@ -127,7 +124,6 @@ export const InsightsScreen: React.FC<Props> = ({ exercises }) => {
                   <h2 className="text-lg font-semibold text-app-text">{t.labels.recentProgress}</h2>
                   <p className="mt-1 text-sm text-app-text-muted">{t.labels.noInsightsDesc || 'Start logging exercises to see your progress'}</p>
                 </div>
-                <span className="flex-shrink-0 text-xs text-app-text-muted">{recentProgressions.length}</span>
               </div>
               {renderRecentList()}
             </section>
@@ -140,7 +136,6 @@ export const InsightsScreen: React.FC<Props> = ({ exercises }) => {
                   <h2 className="text-lg font-semibold text-app-text">{t.labels.topWeightExercises}</h2>
                   <p className="mt-1 text-sm text-app-text-muted">{t.labels.noInsightsDesc || 'Start logging exercises to see your progress'}</p>
                 </div>
-                <span className="flex-shrink-0 text-xs text-app-text-muted">{topWeightExercises.length}</span>
               </div>
               {renderTopWeightList()}
             </section>

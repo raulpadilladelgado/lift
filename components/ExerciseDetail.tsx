@@ -380,44 +380,42 @@ export const ExerciseDetail: React.FC<Props> = ({
             </div>
           </div>
 
-      <div className="space-y-3">
-        {editableLogs.map((log, index) => (
-          <Surface key={log.originalDate}>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <div className="sm:col-span-1">
-                <label className="mb-1 block text-xs font-medium text-app-text-muted">{t.labels.date}</label>
+          <div className="space-y-3">
+            {editableLogs.map((log, index) => (
+              <Surface key={log.originalDate}>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <div className="col-span-2 sm:col-span-2">
+                    <label className="mb-1 block text-xs font-medium text-app-text-muted">{t.labels.date}</label>
+                    <Input
+                      type="date"
+                      value={log.date}
+                      onChange={(e) => handleLogChange(index, 'date', e.target.value)}
+                      onBlur={() => handleLogBlur(index)}
+                      compact
+                      className="w-[calc(100%-1.5rem)] text-xs"
+                    />
+                  </div>
+              <div className="col-span-1">
+                <label className="mb-1 block text-xs font-medium text-app-text-muted">{t.labels.weightShort}</label>
                 <Input
-                  type="date"
-                  value={log.date}
-                  onChange={(e) => handleLogChange(index, 'date', e.target.value)}
+                  type="number"
+                  inputMode="decimal"
+                  value={log.weight}
+                  onChange={(e) => handleLogChange(index, 'weight', e.target.value)}
                   onBlur={() => handleLogBlur(index)}
                   compact
-                  className="w-full"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3 sm:col-span-2">
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-app-text-muted">{t.labels.weightShort}</label>
-                  <Input
-                    type="number"
-                    inputMode="decimal"
-                    value={log.weight}
-                    onChange={(e) => handleLogChange(index, 'weight', e.target.value)}
-                    onBlur={() => handleLogBlur(index)}
-                    compact
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-app-text-muted">{t.labels.reps}</label>
-                  <Input
-                    type="number"
-                    inputMode="numeric"
-                    value={log.reps}
-                    onChange={(e) => handleLogChange(index, 'reps', e.target.value)}
-                    onBlur={() => handleLogBlur(index)}
-                    compact
-                  />
-                </div>
+              <div className="col-span-1">
+                <label className="mb-1 block text-xs font-medium text-app-text-muted">{t.labels.reps}</label>
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  value={log.reps}
+                  onChange={(e) => handleLogChange(index, 'reps', e.target.value)}
+                  onBlur={() => handleLogBlur(index)}
+                  compact
+                />
               </div>
             </div>
             <div className="mt-3 flex justify-end">

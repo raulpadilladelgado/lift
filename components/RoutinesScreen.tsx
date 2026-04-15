@@ -471,7 +471,8 @@ export const RoutinesScreen: React.FC<Props> = ({
       <Modal open={!!editingExerciseId} onClose={() => { setEditingExerciseId(null); setEditingRoutineId(null); }} position="bottom">
         {editingExerciseId && exercises.find((e) => e.id === editingExerciseId) && editingRoutineId && (
           <div className="flex max-h-[calc(100dvh-1.5rem)] flex-col overflow-hidden">
-            <div className="overflow-y-auto px-6 py-6 pt-[env(safe-area-inset-top,1.5rem)] pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
+            <div className="overflow-y-auto px-6 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-8">
+              <div className="pt-[env(safe-area-inset-top,0px)]">
               {(() => {
                 const routine = routines.find((r) => r.id === editingRoutineId);
                 const routineExercise = routine?.exercises.find((re) => re.exerciseId === editingExerciseId);
@@ -523,6 +524,7 @@ export const RoutinesScreen: React.FC<Props> = ({
                   />
                 );
               })()}
+              </div>
             </div>
           </div>
         )}
