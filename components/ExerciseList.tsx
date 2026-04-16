@@ -110,7 +110,7 @@ export const ExerciseList: React.FC<Props> = ({
       />
 
       {muscleGroups.length > 0 && (
-        <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+        <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           <button
             onClick={() => setActiveGroup(null)}
             className={cn(
