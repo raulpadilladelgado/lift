@@ -196,7 +196,7 @@ const App: React.FC = () => {
       <div className="min-h-screen pb-24 sm:mx-auto sm:max-w-md">
 
         {showHeader && (
-          <header className={cn('home-header-glass sticky top-0 z-20', appHeaderClassName)}>
+          <header className={cn('home-header-divider sticky top-0 z-20 bg-app-bg', appHeaderClassName)}>
             <div className="relative">
               <h1 className={appHeaderTitleClassName}>{t.appTitle}</h1>
               <div className="absolute right-0 top-1/2 -translate-y-1/2">
