@@ -202,70 +202,10 @@ export const ExerciseDetail: React.FC<Props> = ({
 
   return (
     <div className="animate-fadeIn">
-      {routineExercise && (
-        <Surface className="mb-6">
-          <p className="mb-3 text-xs font-medium uppercase tracking-wide text-app-text-muted">{t.labels.routines}</p>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <label className="block text-xs font-medium text-app-text-muted">{t.labels.sets}</label>
-              <Input
-                compact
-                type="text"
-                inputMode="numeric"
-                value={routineSets}
-                onChange={(e) => setRoutineSets(e.target.value)}
-                onBlur={handleRoutineSetsBlur}
-                className="text-center"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="block text-xs font-medium text-app-text-muted">{t.labels.reps}</label>
-              <Input
-                compact
-                type="text"
-                inputMode="text"
-                value={routineReps}
-                onChange={(e) => setRoutineReps(e.target.value)}
-                onBlur={handleRoutineRepsBlur}
-                disabled={routineExercise.toFailure}
-                className="text-center disabled:opacity-30"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="block text-xs font-medium text-app-text-muted">{t.labels.dropset}</label>
-              <button
-                onClick={handleToggleDropset}
-                className={cn(
-                  'w-full rounded-xl border px-3 py-3 text-sm font-semibold transition-colors active:opacity-70',
-                  routineExercise.dropset
-                    ? 'border-app-warning bg-app-warning text-white'
-                    : 'border-app-border bg-app-surface text-app-text-muted'
-                )}
-              >
-                {routineExercise.dropset ? 'Yes' : 'No'}
-              </button>
-            </div>
-            <div className="space-y-1">
-              <label className="block text-xs font-medium text-app-text-muted">{t.labels.toFailure}</label>
-              <button
-                onClick={handleToggleToFailure}
-                className={cn(
-                  'w-full rounded-xl border px-3 py-3 text-sm font-semibold transition-colors active:opacity-70',
-                  routineExercise.toFailure
-                    ? 'border-app-danger bg-app-danger text-white'
-                    : 'border-app-border bg-app-surface text-app-text-muted'
-                )}
-              >
-                {routineExercise.toFailure ? 'Yes' : 'No'}
-              </button>
-            </div>
-          </div>
-        </Surface>
-      )}
-
       <div className="mb-6">
         <BackButton label={backLabel ?? t.labels.home} onClick={onBack} />
       </div>
+
 
       <div className="mb-6">
         <div className="flex items-start justify-between gap-2">
@@ -319,6 +259,34 @@ export const ExerciseDetail: React.FC<Props> = ({
           </div>
         )}
       </div>
+
+      {routineExercise && (
+        <Surface className="mb-4">
+          <p className="mb-3 text-xs font-medium uppercase tracking-wide text-app-text-muted">{t.labels.routines}</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-app-text-muted">{t.labels.sets}</label>
+              <Input compact type="text" inputMode="numeric" value={routineSets} onChange={(e) => setRoutineSets(e.target.value)} onBlur={handleRoutineSetsBlur} className="text-center" />
+            </div>
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-app-text-muted">{t.labels.reps}</label>
+              <Input compact type="text" inputMode="text" value={routineReps} onChange={(e) => setRoutineReps(e.target.value)} onBlur={handleRoutineRepsBlur} disabled={routineExercise.toFailure} className="text-center disabled:opacity-30" />
+            </div>
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-app-text-muted">{t.labels.dropset}</label>
+              <button onClick={handleToggleDropset} className={cn('w-full rounded-xl border px-3 py-3 text-sm font-semibold transition-colors active:opacity-70', routineExercise.dropset ? 'border-app-warning bg-app-warning text-white' : 'border-app-border bg-app-surface text-app-text-muted')}>
+                {routineExercise.dropset ? 'Yes' : 'No'}
+              </button>
+            </div>
+            <div className="space-y-1">
+              <label className="block text-xs font-medium text-app-text-muted">{t.labels.toFailure}</label>
+              <button onClick={handleToggleToFailure} className={cn('w-full rounded-xl border px-3 py-3 text-sm font-semibold transition-colors active:opacity-70', routineExercise.toFailure ? 'border-app-danger bg-app-danger text-white' : 'border-app-border bg-app-surface text-app-text-muted')}>
+                {routineExercise.toFailure ? 'Yes' : 'No'}
+              </button>
+            </div>
+          </div>
+        </Surface>
+      )}
 
       <Surface className="mb-4">
         <label className="mb-1 block text-xs font-medium text-app-text-muted">{t.labels.note}</label>
