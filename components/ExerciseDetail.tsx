@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ChevronLeft, Pencil, Trash2, X } from 'lucide-react';
+import { Pencil, Trash2, X } from 'lucide-react';
 import { Exercise, ExerciseLog } from '../types';
 import { useTranslations, getTranslatedGroupName } from '../utils/translations';
 import { getLatestLog } from '../utils/progression';
 import { useToast } from '../hooks/useToast';
 import ConfirmModal from './ConfirmModal';
+import { BackButton } from './ui/BackButton';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 import { Surface } from './ui/Surface';
@@ -31,6 +32,7 @@ interface Props {
   onRename: (name: string) => void;
   onChangeGroup: (group: string) => void;
   onDelete: () => void;
+  backLabel?: string;
   routineExercise?: RoutineExerciseSettings;
   onUpdateRoutineExercise?: (settings: RoutineExerciseSettings) => void;
 }
@@ -57,6 +59,7 @@ export const ExerciseDetail: React.FC<Props> = ({
   onRename,
   onChangeGroup,
   onDelete,
+  backLabel,
   routineExercise,
   onUpdateRoutineExercise,
 }) => {
@@ -201,7 +204,7 @@ export const ExerciseDetail: React.FC<Props> = ({
     <div className="animate-fadeIn">
       {routineExercise && (
         <Surface className="mb-6">
-          <p className="mb-3 text-xs font-medium uppercase tracking-wide text-app-text-muted">{t.labels.routine ?? 'Routine'}</p>
+          <p className="mb-3 text-xs font-medium uppercase tracking-wide text-app-text-muted">{t.labels.routines}</p>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <label className="block text-xs font-medium text-app-text-muted">{t.labels.sets}</label>
@@ -260,48 +263,48 @@ export const ExerciseDetail: React.FC<Props> = ({
         </Surface>
       )}
 
-      <div className="flex items-center justify-between mb-6">
-        <button
-          onClick={onBack}
-          className="-ml-2 flex h-10 w-10 items-center justify-center text-app-text active:opacity-60"
-        >
-          <ChevronLeft size={28} />
-        </button>
-        <button
-          onClick={() => setConfirmAction({ action: 'deleteExercise' })}
-          className="flex h-10 w-10 items-center justify-center text-app-danger active:opacity-60"
-        >
-          <Trash2 size={20} />
-        </button>
+      <div className="mb-6">
+        <BackButton label={backLabel ?? t.labels.home} onClick={onBack} />
       </div>
 
       <div className="mb-6">
-        {editingName ? (
-          <input
-            autoFocus
-            type="text"
-            value={nameValue}
-            onChange={(e) => setNameValue(e.target.value)}
-            onBlur={handleNameBlur}
-            onKeyDown={(e) => { if (e.key === 'Enter') handleNameBlur(); if (e.key === 'Escape') setEditingName(false); }}
-            className="w-full border-b-2 border-app-accent bg-transparent pb-1 text-2xl font-bold text-app-text outline-none"
-          />
-        ) : (
-          <button
-            className="flex items-center gap-2 group active:opacity-70"
-            onClick={() => setEditingName(true)}
-          >
-            <h1 className="text-2xl font-bold text-app-text">{exercise.name}</h1>
-            <Pencil size={16} className="text-app-text-muted opacity-60 group-hover:opacity-100" />
-          </button>
-        )}
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            {editingName ? (
+              <input
+                autoFocus
+                type="text"
+                value={nameValue}
+                onChange={(e) => setNameValue(e.target.value)}
+                onBlur={handleNameBlur}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleNameBlur(); if (e.key === 'Escape') setEditingName(false); }}
+                className="w-full border-b-2 border-app-accent bg-transparent pb-1 text-2xl font-bold text-app-text outline-none"
+              />
+            ) : (
+              <button
+                className="flex items-center gap-2 group active:opacity-70"
+                onClick={() => setEditingName(true)}
+              >
+                <h1 className="text-2xl font-bold text-app-text">{exercise.name}</h1>
+                <Pencil size={16} className="text-app-text-muted opacity-60 group-hover:opacity-100" />
+              </button>
+            )}
 
-        <button
-          onClick={() => setShowGroupPicker((v) => !v)}
-          className="mt-1 text-sm text-app-text underline decoration-app-accent decoration-2 underline-offset-4 active:opacity-70"
-        >
-          {getTranslatedGroupName(exercise.muscleGroup)}
-        </button>
+            <button
+              onClick={() => setShowGroupPicker((v) => !v)}
+              className="mt-1 text-sm text-app-text underline decoration-app-accent decoration-2 underline-offset-4 active:opacity-70"
+            >
+              {getTranslatedGroupName(exercise.muscleGroup)}
+            </button>
+          </div>
+
+          <button
+            onClick={() => setConfirmAction({ action: 'deleteExercise' })}
+            className="flex h-10 w-10 shrink-0 items-center justify-center text-app-danger active:opacity-60"
+          >
+            <Trash2 size={20} />
+          </button>
+        </div>
 
         {showGroupPicker && (
           <div className="mt-3">

@@ -17,6 +17,7 @@ import { Input } from './ui/Input';
 import { SearchInput } from './ui/SearchInput';
 import { Surface } from './ui/Surface';
 import { ListRow } from './ui/ListRow';
+import { BackButton } from './ui/BackButton';
 import { cn } from '../utils/cn';
 
 interface Props {
@@ -254,9 +255,11 @@ export const RoutinesScreen: React.FC<Props> = ({
     <div className="space-y-6">
       {activeRoutine ? (
         <div className="space-y-4">
+          <div className="mb-6">
+            <BackButton label={t.labels.routines} onClick={() => setActiveRoutineId(null)} />
+          </div>
           <div className="mb-2 flex items-center justify-between">
-            <button onClick={() => setActiveRoutineId(null)} className="text-sm font-semibold text-app-text active:opacity-70">← {t.labels.routines}</button>
-            <h1 className="max-w-[60%] truncate text-center text-xl font-bold text-app-text">{activeRoutine.name}</h1>
+            <h1 className="text-xl font-bold text-app-text">{activeRoutine.name}</h1>
             <button onClick={() => openEdit(activeRoutine)} className="p-1 text-app-text active:opacity-70" aria-label={t.actions.edit}>
               <Pencil size={18} />
             </button>
@@ -478,6 +481,7 @@ export const RoutinesScreen: React.FC<Props> = ({
                   <ExerciseDetail
                     exercise={exercises.find((e) => e.id === editingExerciseId)!}
                     muscleGroups={muscleGroups}
+                    backLabel={routines.find((r) => r.id === editingRoutineId)?.name ?? t.labels.routines}
                     routineExercise={routineExercise ? { sets: routineExercise.sets, reps: routineExercise.reps, dropset: routineExercise.dropset, toFailure: routineExercise.toFailure } : undefined}
                     onBack={() => { setEditingExerciseId(null); setEditingRoutineId(null); }}
                     onLog={(weight, reps) => {
