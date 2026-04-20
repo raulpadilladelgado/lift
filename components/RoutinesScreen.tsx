@@ -606,7 +606,7 @@ const RoutineExerciseCard: React.FC<RoutineExerciseCardProps> = ({
       </div>
 
       <div className="mb-3 flex items-center gap-2">
-        <Badge variant="accent" className="px-2 py-0.5">{routineExercise.reps ? `${routineExercise.sets}×${routineExercise.reps}` : `${routineExercise.sets}`}</Badge>
+        <Badge variant="accent" className="px-2 py-0.5">{routineExercise.reps ? `${routineExercise.sets} sets × ${routineExercise.reps} reps` : `${routineExercise.sets} sets`}</Badge>
         {routineExercise.toFailure && <Badge variant="danger">{t.labels.toFailure}</Badge>}
         {routineExercise.dropset && <Badge variant="warning">{t.labels.dropset}</Badge>}
       </div>
