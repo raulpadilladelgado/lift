@@ -32,6 +32,7 @@ const App: React.FC = () => {
   );
   const [isStandalone, setIsStandalone] = useState(true);
   const [screenResetSignal, setScreenResetSignal] = useState(0);
+  const [activeRoutineId, setActiveRoutineId] = useState<string | null>(null);
 
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
 
@@ -84,6 +85,7 @@ const App: React.FC = () => {
     if (screen === 'home') {
       setSelectedExercise(null);
     } else {
+      setActiveRoutineId(null);
       setScreenResetSignal((n) => n + 1);
     }
   };
@@ -258,6 +260,8 @@ const App: React.FC = () => {
               routines={routines}
               exercises={exercises}
               muscleGroups={muscleGroups}
+              activeRoutineId={activeRoutineId}
+              onActiveRoutineChange={setActiveRoutineId}
               onSaveRoutine={handleSaveRoutine}
               onDeleteRoutine={handleDeleteRoutine}
               onLogExercise={handleLog}

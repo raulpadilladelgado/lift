@@ -22,6 +22,8 @@ interface Props {
   routines: Routine[];
   exercises: Exercise[];
   muscleGroups: string[];
+  activeRoutineId: string | null;
+  onActiveRoutineChange: (id: string | null) => void;
   onSaveRoutine: (routine: Routine) => void;
   onDeleteRoutine: (id: string) => void;
   onLogExercise: (exerciseId: string, weight: number, reps: number) => void;
@@ -51,6 +53,8 @@ export const RoutinesScreen: React.FC<Props> = ({
   routines,
   exercises,
   muscleGroups,
+  activeRoutineId,
+  onActiveRoutineChange,
   onSaveRoutine,
   onDeleteRoutine,
   onLogExercise,
@@ -66,7 +70,6 @@ export const RoutinesScreen: React.FC<Props> = ({
   resetSignal,
 }) => {
   const t = useTranslations();
-  const [activeRoutineId, setActiveRoutineId] = useState<string | null>(null);
   const [modalMode, setModalMode] = useState<ModalMode | null>(null);
   const [editingRoutine, setEditingRoutine] = useState<Routine | null>(null);
   const [formName, setFormName] = useState('');
@@ -85,7 +88,7 @@ export const RoutinesScreen: React.FC<Props> = ({
   const [movingRoutineTargetIndex, setMovingRoutineTargetIndex] = useState<number>(0);
 
   useEffect(() => {
-    setActiveRoutineId(null);
+    onActiveRoutineChange(null);
     setModalMode(null);
   }, [resetSignal]);
 
@@ -174,7 +177,7 @@ export const RoutinesScreen: React.FC<Props> = ({
   const handleConfirmDeleteRoutine = () => {
     if (!confirmDeleteRoutineId) return;
     onDeleteRoutine(confirmDeleteRoutineId);
-    if (activeRoutineId === confirmDeleteRoutineId) setActiveRoutineId(null);
+    if (activeRoutineId === confirmDeleteRoutineId) onActiveRoutineChange(null);
     setConfirmDeleteRoutineId(null);
   };
 
@@ -348,7 +351,7 @@ export const RoutinesScreen: React.FC<Props> = ({
       {activeRoutine ? (
         <div className="space-y-4">
           <div className="mb-6">
-            <BackButton label={t.labels.routines} onClick={() => setActiveRoutineId(null)} />
+            <BackButton label={t.labels.routines} onClick={() => onActiveRoutineChange(null)} />
           </div>
           <div className="mb-2 flex items-center justify-between">
             <h1 className="text-xl font-bold text-app-text">{activeRoutine.name}</h1>
@@ -407,7 +410,7 @@ export const RoutinesScreen: React.FC<Props> = ({
                 <RoutineCard
                   key={routine.id}
                   routine={routine}
-                  onClick={() => setActiveRoutineId(routine.id)}
+                  onClick={() => onActiveRoutineChange(routine.id)}
                   onEdit={() => openEdit(routine)}
                   onDelete={() => handleDelete(routine.id)}
                   onDuplicate={() => handleDuplicate(routine)}
