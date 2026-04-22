@@ -33,6 +33,7 @@ const App: React.FC = () => {
   const [isStandalone, setIsStandalone] = useState(true);
   const [screenResetSignal, setScreenResetSignal] = useState(0);
   const [activeRoutineId, setActiveRoutineId] = useState<string | null>(null);
+  const [exerciseOriginRoutineId, setExerciseOriginRoutineId] = useState<string | null>(null);
 
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
 
@@ -72,6 +73,7 @@ const App: React.FC = () => {
     window.scrollTo(0, 0);
     if (currentScreen !== 'home') {
       setSelectedExercise(null);
+      setExerciseOriginRoutineId(null);
     }
   }, [currentScreen]);
 
@@ -84,8 +86,10 @@ const App: React.FC = () => {
   const handleScreenReset = (screen: ScreenType) => {
     if (screen === 'home') {
       setSelectedExercise(null);
+      setExerciseOriginRoutineId(null);
     } else {
       setActiveRoutineId(null);
+      setExerciseOriginRoutineId(null);
       setScreenResetSignal((n) => n + 1);
     }
   };
@@ -194,6 +198,14 @@ const App: React.FC = () => {
     ? (exercises.find((e) => e.id === selectedExercise.id) ?? null)
     : null;
 
+  const handleExerciseBack = () => {
+    if (exerciseOriginRoutineId) {
+      setActiveRoutineId(exerciseOriginRoutineId);
+    }
+    setSelectedExercise(null);
+    setExerciseOriginRoutineId(null);
+  };
+
   const showHeader = currentScreen === 'home' && !currentExercise;
   const appHeaderClassName = 'px-4 pt-6 pb-4';
   const appHeaderTitleClassName = 'text-center text-2xl font-bold text-app-text';
@@ -244,7 +256,7 @@ const App: React.FC = () => {
               exercise={currentExercise}
               muscleGroups={muscleGroups}
               backLabel={currentScreen === 'routines' ? t.labels.routines : undefined}
-              onBack={() => setSelectedExercise(null)}
+              onBack={handleExerciseBack}
               onLog={(w, r) => { handleLog(currentExercise.id, w, r); refreshSelectedExercise(currentExercise.id); }}
               onUpdateNote={(note) => { handleUpdateNote(currentExercise.id, note); refreshSelectedExercise(currentExercise.id); }}
               onUpdateLog={(origDate, log) => { handleUpdateLog(currentExercise.id, origDate, log); refreshSelectedExercise(currentExercise.id); }}
@@ -276,7 +288,10 @@ const App: React.FC = () => {
                 storageManager.deleteExercise(id);
                 loadData();
               }}
-              onNavigateToExercise={(id) => setSelectedExercise({ id })}
+              onNavigateToExercise={(id, routineId) => {
+                setExerciseOriginRoutineId(routineId);
+                setSelectedExercise({ id } as Exercise);
+              }}
               resetSignal={screenResetSignal}
             />
           ) : (

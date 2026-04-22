@@ -35,7 +35,7 @@ interface Props {
   onDeleteAllLogs: (exerciseId: string) => void;
   onDeleteAllLogsExceptLatest: (exerciseId: string) => void;
   onDeleteExercise: (exerciseId: string) => void;
-  onNavigateToExercise: (exerciseId: string) => void;
+  onNavigateToExercise: (exerciseId: string, routineId: string) => void;
   resetSignal?: number;
 }
 
@@ -381,7 +381,7 @@ export const RoutinesScreen: React.FC<Props> = ({
                     onUpdateForm={(field, value) => updateLogForm(displayExercise.id, field, value)}
                     onLog={() => handleLog(displayExercise.id)}
                     onLongPress={() => setActionSheetExerciseId(exercise.id)}
-                    onTap={() => onNavigateToExercise(exercise.id)}
+                     onTap={() => onNavigateToExercise(exercise.id, activeRoutine.id)}
                     onToggleAlternative={() => setUsingAlternative((prev) => ({ ...prev, [exercise.id]: !prev[exercise.id] }))}
                   />
                 );
