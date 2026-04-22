@@ -34,6 +34,7 @@ const App: React.FC = () => {
   const [screenResetSignal, setScreenResetSignal] = useState(0);
   const [activeRoutineId, setActiveRoutineId] = useState<string | null>(null);
   const [exerciseOriginRoutineId, setExerciseOriginRoutineId] = useState<string | null>(null);
+  const [exerciseOriginScreen, setExerciseOriginScreen] = useState<ScreenType | null>(null);
 
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
 
@@ -74,6 +75,7 @@ const App: React.FC = () => {
     if (currentScreen !== 'home') {
       setSelectedExercise(null);
       setExerciseOriginRoutineId(null);
+      setExerciseOriginScreen(null);
     }
   }, [currentScreen]);
 
@@ -87,9 +89,11 @@ const App: React.FC = () => {
     if (screen === 'home') {
       setSelectedExercise(null);
       setExerciseOriginRoutineId(null);
+      setExerciseOriginScreen(null);
     } else {
       setActiveRoutineId(null);
       setExerciseOriginRoutineId(null);
+      setExerciseOriginScreen(null);
       setScreenResetSignal((n) => n + 1);
     }
   };
@@ -199,11 +203,15 @@ const App: React.FC = () => {
     : null;
 
   const handleExerciseBack = () => {
+    if (exerciseOriginScreen) {
+      setCurrentScreen(exerciseOriginScreen);
+    }
     if (exerciseOriginRoutineId) {
       setActiveRoutineId(exerciseOriginRoutineId);
     }
     setSelectedExercise(null);
     setExerciseOriginRoutineId(null);
+    setExerciseOriginScreen(null);
   };
 
   const showHeader = currentScreen === 'home' && !currentExercise;
@@ -247,15 +255,11 @@ const App: React.FC = () => {
         )}
 
           <main className="animate-slideUp px-4 pb-24 pt-4">
-          {currentScreen === 'settings' ? (
-            <SettingsScreen onExport={handleExport} onImport={handleImportData} />
-          ) : currentScreen === 'insights' ? (
-            <InsightsScreen exercises={exercises} />
-          ) : currentExercise ? (
+          {currentExercise ? (
             <ExerciseDetail
               exercise={currentExercise}
               muscleGroups={muscleGroups}
-              backLabel={currentScreen === 'routines' ? t.labels.routines : undefined}
+              backLabel={currentScreen === 'routines' ? t.labels.routines : currentScreen === 'insights' ? t.labels.insights : undefined}
               onBack={handleExerciseBack}
               onLog={(w, r) => { handleLog(currentExercise.id, w, r); refreshSelectedExercise(currentExercise.id); }}
               onUpdateNote={(note) => { handleUpdateNote(currentExercise.id, note); refreshSelectedExercise(currentExercise.id); }}
@@ -265,7 +269,18 @@ const App: React.FC = () => {
               onDeleteAllLogsExceptLatest={() => { handleDeleteAllLogsExceptLatest(currentExercise.id); refreshSelectedExercise(currentExercise.id); }}
               onRename={(name) => { storageManager.updateExerciseDetails(currentExercise.id, name, currentExercise.muscleGroup); loadData(); refreshSelectedExercise(currentExercise.id); }}
               onChangeGroup={(group) => { storageManager.updateExerciseDetails(currentExercise.id, currentExercise.name, group); loadData(); refreshSelectedExercise(currentExercise.id); }}
-              onDelete={() => { storageManager.deleteExercise(currentExercise.id); setSelectedExercise(null); loadData(); }}
+              onDelete={() => { storageManager.deleteExercise(currentExercise.id); setSelectedExercise(null); setExerciseOriginRoutineId(null); setExerciseOriginScreen(null); loadData(); }}
+            />
+          ) : currentScreen === 'settings' ? (
+            <SettingsScreen onExport={handleExport} onImport={handleImportData} />
+          ) : currentScreen === 'insights' ? (
+            <InsightsScreen
+              exercises={exercises}
+              onSelectExercise={(id) => {
+                setExerciseOriginScreen('insights');
+                setExerciseOriginRoutineId(null);
+                setSelectedExercise({ id } as Exercise);
+              }}
             />
           ) : currentScreen === 'routines' ? (
             <RoutinesScreen
@@ -289,6 +304,7 @@ const App: React.FC = () => {
                 loadData();
               }}
               onNavigateToExercise={(id, routineId) => {
+                setExerciseOriginScreen('routines');
                 setExerciseOriginRoutineId(routineId);
                 setSelectedExercise({ id } as Exercise);
               }}

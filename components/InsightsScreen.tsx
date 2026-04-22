@@ -23,9 +23,10 @@ export const getProgressVariant = (state: ProgressState) => {
 
 interface Props {
   exercises: Exercise[];
+  onSelectExercise: (exerciseId: string) => void;
 }
 
-export const InsightsScreen: React.FC<Props> = ({ exercises }) => {
+export const InsightsScreen: React.FC<Props> = ({ exercises, onSelectExercise }) => {
   const t = useTranslations();
   const recentProgressions = getRecentProgressions(exercises, 3);
   const topWeightExercises = getTopWeightExercises(exercises, 3);
@@ -64,9 +65,9 @@ export const InsightsScreen: React.FC<Props> = ({ exercises }) => {
     if (recentProgressions.length === 0) return renderEmpty();
 
     return (
-      <div className="space-y-3">
-        {recentProgressions.map((progression) => (
-          <ListRow key={progression.exerciseId}>
+        <div className="space-y-3">
+          {recentProgressions.map((progression) => (
+          <ListRow key={progression.exerciseId} onClick={() => onSelectExercise(progression.exerciseId)} className="cursor-pointer transition-colors active:bg-app-surface-muted">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <h3 className="text-base font-semibold text-app-text">{progression.exerciseName}</h3>
@@ -90,9 +91,9 @@ export const InsightsScreen: React.FC<Props> = ({ exercises }) => {
     if (topWeightExercises.length === 0) return renderEmpty();
 
     return (
-      <div className="space-y-3">
-        {topWeightExercises.map((exercise) => (
-          <ListRow key={exercise.exerciseId}>
+        <div className="space-y-3">
+          {topWeightExercises.map((exercise) => (
+          <ListRow key={exercise.exerciseId} onClick={() => onSelectExercise(exercise.exerciseId)} className="cursor-pointer transition-colors active:bg-app-surface-muted">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <h3 className="text-base font-semibold text-app-text">{exercise.exerciseName}</h3>

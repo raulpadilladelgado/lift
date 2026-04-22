@@ -18,6 +18,11 @@ interface LongPressHandlers {
   onTouchMove: (e: React.TouchEvent) => void;
 }
 
+function isInteractiveTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  return target.closest('button, input, textarea, select, a, label') !== null;
+}
+
 export function useLongPress({ onLongPress, onTap, delay = DEFAULT_DELAY }: Options): LongPressHandlers {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didLongPress = useRef(false);
@@ -26,8 +31,7 @@ export function useLongPress({ onLongPress, onTap, delay = DEFAULT_DELAY }: Opti
 
   const start = useCallback(
     (e: React.TouchEvent | React.MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+      if (isInteractiveTarget(e.target)) return;
 
       if ('touches' in e) {
         touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
@@ -58,6 +62,10 @@ export function useLongPress({ onLongPress, onTap, delay = DEFAULT_DELAY }: Opti
   const end = useCallback(
     (e: React.TouchEvent | React.MouseEvent) => {
       cancel();
+      if (isInteractiveTarget(e.target)) {
+        touchStart.current = null;
+        return;
+      }
       if (!isScrolling.current) {
         if (didLongPress.current) {
           e.preventDefault();
