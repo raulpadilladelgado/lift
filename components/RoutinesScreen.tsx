@@ -705,7 +705,7 @@ const RoutineExerciseCard: React.FC<RoutineExerciseCardProps> = ({
     <ListRow {...handlers} className="select-none">
       <div className="mb-2 flex items-start justify-between">
         <div className="min-w-0 flex-1">
-          <h3 className="truncate text-base font-semibold text-app-text">{exercise.name}</h3>
+          <h3 className="text-base font-semibold text-app-text">{exercise.name}</h3>
           <p className="mt-0.5 text-xs uppercase tracking-wide text-app-text-muted">{getTranslatedGroupName(exercise.muscleGroup)}</p>
         </div>
         {alternativeExercise && (
