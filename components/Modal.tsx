@@ -49,7 +49,8 @@ export const Modal: React.FC<Props> = ({ open, onClose, position = 'center', lab
   return createPortal(
     <div
       role="presentation"
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-3 ${blurBackdrop ? 'backdrop-blur-[2px]' : ''}`}
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/55 px-3 pb-3 ${blurBackdrop ? 'backdrop-blur-[2px]' : ''}`}
+      style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}
       onClick={handleBackdrop}
       onTouchEnd={handleBackdrop}
     >
