@@ -221,7 +221,7 @@ const App: React.FC = () => {
         )}
 
         {currentScreen !== 'home' && (
-          <header className={appHeaderClassName}>
+          <header className={cn('sticky top-0 z-20 bg-app-bg', appHeaderClassName)}>
             <div className="relative">
               <h1 className={appHeaderTitleClassName}>
               {currentScreen === 'insights' ? t.labels.insights
