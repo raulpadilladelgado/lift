@@ -381,7 +381,7 @@ export const RoutinesScreen: React.FC<Props> = ({
                     onUpdateForm={(field, value) => updateLogForm(displayExercise.id, field, value)}
                     onLog={() => handleLog(displayExercise.id)}
                     onLongPress={() => setActionSheetExerciseId(exercise.id)}
-                     onTap={() => onNavigateToExercise(exercise.id, activeRoutine.id)}
+                    onTap={() => onNavigateToExercise(displayExercise.id, activeRoutine.id)}
                     onToggleAlternative={() => setUsingAlternative((prev) => ({ ...prev, [exercise.id]: !prev[exercise.id] }))}
                   />
                 );
