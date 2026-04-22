@@ -220,7 +220,7 @@ const App: React.FC = () => {
           </header>
         )}
 
-        {currentScreen !== 'home' && (
+        {currentScreen !== 'home' && !currentExercise && (
           <header className={cn('sticky top-0 z-20 bg-app-bg', appHeaderClassName)}>
             <div className="relative">
               <h1 className={appHeaderTitleClassName}>
@@ -237,6 +237,22 @@ const App: React.FC = () => {
             <SettingsScreen onExport={handleExport} onImport={handleImportData} />
           ) : currentScreen === 'insights' ? (
             <InsightsScreen exercises={exercises} />
+          ) : currentExercise ? (
+            <ExerciseDetail
+              exercise={currentExercise}
+              muscleGroups={muscleGroups}
+              backLabel={currentScreen === 'routines' ? t.labels.routines : undefined}
+              onBack={() => setSelectedExercise(null)}
+              onLog={(w, r) => { handleLog(currentExercise.id, w, r); refreshSelectedExercise(currentExercise.id); }}
+              onUpdateNote={(note) => { handleUpdateNote(currentExercise.id, note); refreshSelectedExercise(currentExercise.id); }}
+              onUpdateLog={(origDate, log) => { handleUpdateLog(currentExercise.id, origDate, log); refreshSelectedExercise(currentExercise.id); }}
+              onDeleteLog={(date) => { handleDeleteLog(currentExercise.id, date); refreshSelectedExercise(currentExercise.id); }}
+              onDeleteAllLogs={() => { handleDeleteAllLogs(currentExercise.id); refreshSelectedExercise(currentExercise.id); }}
+              onDeleteAllLogsExceptLatest={() => { handleDeleteAllLogsExceptLatest(currentExercise.id); refreshSelectedExercise(currentExercise.id); }}
+              onRename={(name) => { storageManager.updateExerciseDetails(currentExercise.id, name, currentExercise.muscleGroup); loadData(); refreshSelectedExercise(currentExercise.id); }}
+              onChangeGroup={(group) => { storageManager.updateExerciseDetails(currentExercise.id, currentExercise.name, group); loadData(); refreshSelectedExercise(currentExercise.id); }}
+              onDelete={() => { storageManager.deleteExercise(currentExercise.id); setSelectedExercise(null); loadData(); }}
+            />
           ) : currentScreen === 'routines' ? (
             <RoutinesScreen
               routines={routines}
@@ -256,22 +272,8 @@ const App: React.FC = () => {
                 storageManager.deleteExercise(id);
                 loadData();
               }}
+              onNavigateToExercise={(id) => setSelectedExercise({ id })}
               resetSignal={screenResetSignal}
-            />
-          ) : currentExercise ? (
-            <ExerciseDetail
-              exercise={currentExercise}
-              muscleGroups={muscleGroups}
-              onBack={() => setSelectedExercise(null)}
-              onLog={(w, r) => { handleLog(currentExercise.id, w, r); refreshSelectedExercise(currentExercise.id); }}
-              onUpdateNote={(note) => { handleUpdateNote(currentExercise.id, note); refreshSelectedExercise(currentExercise.id); }}
-              onUpdateLog={(origDate, log) => { handleUpdateLog(currentExercise.id, origDate, log); refreshSelectedExercise(currentExercise.id); }}
-              onDeleteLog={(date) => { handleDeleteLog(currentExercise.id, date); refreshSelectedExercise(currentExercise.id); }}
-              onDeleteAllLogs={() => { handleDeleteAllLogs(currentExercise.id); refreshSelectedExercise(currentExercise.id); }}
-              onDeleteAllLogsExceptLatest={() => { handleDeleteAllLogsExceptLatest(currentExercise.id); refreshSelectedExercise(currentExercise.id); }}
-              onRename={(name) => { storageManager.updateExerciseDetails(currentExercise.id, name, currentExercise.muscleGroup); loadData(); refreshSelectedExercise(currentExercise.id); }}
-              onChangeGroup={(group) => { storageManager.updateExerciseDetails(currentExercise.id, currentExercise.name, group); loadData(); refreshSelectedExercise(currentExercise.id); }}
-              onDelete={() => { storageManager.deleteExercise(currentExercise.id); setSelectedExercise(null); loadData(); }}
             />
           ) : (
             <div className="space-y-4">

@@ -7,7 +7,6 @@ import { RoutineCard } from './RoutineCard';
 import { ActionSheet } from './ActionSheet';
 import ConfirmModal from './ConfirmModal';
 import { Modal } from './Modal';
-import { ExerciseDetail } from './ExerciseDetail';
 import { useLongPress } from '../hooks/useLongPress';
 import { useToast } from '../hooks/useToast';
 import { makeId } from '../services/storageService';
@@ -34,6 +33,7 @@ interface Props {
   onDeleteAllLogs: (exerciseId: string) => void;
   onDeleteAllLogsExceptLatest: (exerciseId: string) => void;
   onDeleteExercise: (exerciseId: string) => void;
+  onNavigateToExercise: (exerciseId: string) => void;
   resetSignal?: number;
 }
 
@@ -62,6 +62,7 @@ export const RoutinesScreen: React.FC<Props> = ({
   onDeleteAllLogs,
   onDeleteAllLogsExceptLatest,
   onDeleteExercise,
+  onNavigateToExercise,
   resetSignal,
 }) => {
   const t = useTranslations();
@@ -78,8 +79,6 @@ export const RoutinesScreen: React.FC<Props> = ({
   const [confirmRemoveExerciseId, setConfirmRemoveExerciseId] = useState<string | null>(null);
   const [pickingAlternativeFor, setPickingAlternativeFor] = useState<string | null>(null);
   const [alternativeSearch, setAlternativeSearch] = useState('');
-  const [editingExerciseId, setEditingExerciseId] = useState<string | null>(null);
-  const [editingRoutineId, setEditingRoutineId] = useState<string | null>(null);
   const [movingExerciseId, setMovingExerciseId] = useState<string | null>(null);
   const [movingExerciseTargetIndex, setMovingExerciseTargetIndex] = useState<number>(0);
   const [movingRoutineId, setMovingRoutineId] = useState<string | null>(null);
@@ -380,6 +379,7 @@ export const RoutinesScreen: React.FC<Props> = ({
                     onUpdateForm={(field, value) => updateLogForm(displayExercise.id, field, value)}
                     onLog={() => handleLog(displayExercise.id)}
                     onLongPress={() => setActionSheetExerciseId(exercise.id)}
+                    onTap={() => onNavigateToExercise(exercise.id)}
                     onToggleAlternative={() => setUsingAlternative((prev) => ({ ...prev, [exercise.id]: !prev[exercise.id] }))}
                   />
                 );
@@ -553,7 +553,6 @@ export const RoutinesScreen: React.FC<Props> = ({
         <ActionSheet
           title={actionSheetExerciseName}
           actions={[
-            { label: t.actions.edit, onPress: () => { setEditingExerciseId(actionSheetExerciseId); setEditingRoutineId(activeRoutineId); setActionSheetExerciseId(null); } },
             { label: t.labels.move, onPress: () => { openMoveExercise(actionSheetExerciseId); setActionSheetExerciseId(null); } },
             { label: t.labels.removeFromRoutine, destructive: true, onPress: () => { setConfirmRemoveExerciseId(actionSheetExerciseId); setActionSheetExerciseId(null); } },
           ]}
@@ -716,69 +715,6 @@ export const RoutinesScreen: React.FC<Props> = ({
       {confirmRemoveExerciseId && (
         <ConfirmModal title={t.labels.removeFromRoutine} confirmLabel={t.actions.delete} destructive onConfirm={() => handleRemoveExerciseFromRoutine(confirmRemoveExerciseId)} onCancel={() => setConfirmRemoveExerciseId(null)} />
       )}
-
-      <Modal open={!!editingExerciseId} onClose={() => { setEditingExerciseId(null); setEditingRoutineId(null); }} position="bottom">
-        {editingExerciseId && exercises.find((e) => e.id === editingExerciseId) && editingRoutineId && (
-          <div className="flex max-h-[calc(100dvh-1.5rem)] flex-col overflow-hidden">
-            <div className="overflow-y-auto px-6 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-8">
-              <div className="pt-[env(safe-area-inset-top,0px)]">
-              {(() => {
-                const routine = routines.find((r) => r.id === editingRoutineId);
-                const routineExercise = routine?.exercises.find((re) => re.exerciseId === editingExerciseId);
-                return (
-                  <ExerciseDetail
-                    exercise={exercises.find((e) => e.id === editingExerciseId)!}
-                    muscleGroups={muscleGroups}
-                    backLabel={routines.find((r) => r.id === editingRoutineId)?.name ?? t.labels.routines}
-                    routineExercise={routineExercise ? { sets: routineExercise.sets, reps: routineExercise.reps, dropset: routineExercise.dropset, toFailure: routineExercise.toFailure } : undefined}
-                    onBack={() => { setEditingExerciseId(null); setEditingRoutineId(null); }}
-                    onLog={(weight, reps) => {
-                      onLogExercise(editingExerciseId, weight, reps);
-                    }}
-                    onUpdateNote={(note) => {
-                      onUpdateNote(editingExerciseId, note);
-                    }}
-                    onUpdateLog={(originalDate, log) => {
-                      onUpdateLog(editingExerciseId, originalDate, log);
-                    }}
-                    onDeleteLog={(date) => {
-                      onDeleteLog(editingExerciseId, date);
-                    }}
-                    onDeleteAllLogs={() => {
-                      onDeleteAllLogs(editingExerciseId);
-                    }}
-                    onDeleteAllLogsExceptLatest={() => {
-                      onDeleteAllLogsExceptLatest(editingExerciseId);
-                    }}
-                    onRename={(name) => {
-                      // This would need to be passed as a prop - for now we skip rename from routine context
-                    }}
-                    onChangeGroup={(group) => {
-                      // This would need to be passed as a prop - for now we skip group change from routine context
-                    }}
-                    onDelete={() => {
-                      onDeleteExercise(editingExerciseId);
-                      setEditingExerciseId(null);
-                    }}
-                    onUpdateRoutineExercise={(settings) => {
-                      if (routine && routineExercise) {
-                        const updatedRoutine = {
-                          ...routine,
-                          exercises: routine.exercises.map((re) =>
-                            re.exerciseId === editingExerciseId ? { ...re, sets: settings.sets, reps: settings.reps, dropset: settings.dropset, toFailure: settings.toFailure } : re
-                          ),
-                        };
-                        onSaveRoutine(updatedRoutine);
-                      }
-                    }}
-                  />
-                );
-              })()}
-              </div>
-            </div>
-          </div>
-        )}
-      </Modal>
     </div>
   );
 };
@@ -792,6 +728,7 @@ interface RoutineExerciseCardProps {
   onUpdateForm: (field: keyof LogFormState, value: string) => void;
   onLog: () => void;
   onLongPress: () => void;
+  onTap: () => void;
   onToggleAlternative: () => void;
 }
 
@@ -804,10 +741,11 @@ const RoutineExerciseCard: React.FC<RoutineExerciseCardProps> = ({
   onUpdateForm,
   onLog,
   onLongPress,
+  onTap,
   onToggleAlternative,
 }) => {
   const t = useTranslations();
-  const handlers = useLongPress({ onLongPress });
+  const handlers = useLongPress({ onLongPress, onTap });
 
   return (
     <ListRow {...handlers} className="select-none">
