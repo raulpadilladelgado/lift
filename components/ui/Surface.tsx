@@ -9,8 +9,8 @@ export const Surface: React.FC<Props> = ({ className, padded = true, ...props })
   return (
     <div
       className={cn(
-        'rounded-2xl border border-app-border bg-app-surface',
-        padded && 'p-4 sm:p-5',
+        'rounded-3xl border border-app-border bg-app-surface shadow-sm',
+        padded && 'p-5',
         className
       )}
       {...props}

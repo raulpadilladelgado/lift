@@ -217,7 +217,7 @@ const App: React.FC = () => {
 
   const showHeader = currentScreen === 'home' && !currentExercise;
   const appHeaderClassName = 'px-4 pt-6 pb-4';
-  const appHeaderTitleClassName = 'text-center text-2xl font-bold text-app-text';
+  const appHeaderTitleClassName = 'text-center text-4xl font-black tracking-tighter text-app-text uppercase italic';
 
   return (
     <RestTimerProvider>
@@ -313,22 +313,24 @@ const App: React.FC = () => {
               resetSignal={screenResetSignal}
             />
           ) : (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="space-y-8">
+              <div className="flex flex-col gap-3">
                 <Button
                   onClick={() => { setNewExerciseName(''); setNewExerciseGroup(muscleGroups[0] ?? ''); setAddingExercise(true); }}
-                  className="w-full"
+                  size="lg"
+                  className="w-full rounded-2xl shadow-xl shadow-app-accent/10"
                 >
-                  <Plus size={18} />
+                  <Plus size={24} strokeWidth={3} />
                   {t.labels.newExercise}
                 </Button>
 
                 <Button
                   onClick={() => setAddingGroup(true)}
                   variant="secondary"
-                  className="w-full border-dashed"
+                  size="md"
+                  className="w-full border-2 border-dashed rounded-2xl border-app-border/50 text-app-text-muted"
                 >
-                  <Plus size={20} className="mr-2" />
+                  <Plus size={18} />
                   {t.actions.addGroup}
                 </Button>
               </div>
