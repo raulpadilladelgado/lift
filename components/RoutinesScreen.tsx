@@ -346,7 +346,7 @@ export const RoutinesScreen: React.FC<Props> = ({
   }, [routines, movingRoutineId, movingRoutineFromIndex, movingRoutineTargetIndex]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20">
       {activeRoutine ? (
         <div className="space-y-4">
           <div className="mb-6">
@@ -364,7 +364,7 @@ export const RoutinesScreen: React.FC<Props> = ({
               <p className="font-medium text-app-text">{t.labels.noExercises}</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-3 pb-32">
               {activeRoutineExercises.map(({ routineExercise, exercise, alternativeExercise }) => {
                 const isAlt = !!usingAlternative[exercise.id];
                 const displayExercise = isAlt && alternativeExercise ? alternativeExercise : exercise;
@@ -764,7 +764,9 @@ const RoutineExerciseCard: React.FC<RoutineExerciseCardProps> = ({
       </div>
 
       <div className="mb-3 flex items-center gap-2">
-        <Badge variant="accent" className="px-2 py-0.5">{routineExercise.reps ? `${routineExercise.sets} sets × ${routineExercise.reps} reps` : `${routineExercise.sets} sets`}</Badge>
+        <Badge variant="accent" className="rounded-lg px-2.5 py-1 text-sm bg-app-accent/20 text-app-accent border-none">
+          {routineExercise.reps ? `${routineExercise.sets} sets × ${routineExercise.reps} reps` : `${routineExercise.sets} sets`}
+        </Badge>
         {routineExercise.toFailure && <Badge variant="danger">{t.labels.toFailure}</Badge>}
         {routineExercise.dropset && <Badge variant="warning">{t.labels.dropset}</Badge>}
       </div>

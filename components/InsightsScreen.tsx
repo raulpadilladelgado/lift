@@ -37,7 +37,7 @@ export const InsightsScreen: React.FC<Props> = ({ exercises, onSelectExercise })
     return (
       <div className="flex items-center gap-2">
         <span className="w-10 text-xs text-app-text-muted">{label}</span>
-        <Badge variant="accent" className="rounded-lg px-2.5 py-1 text-sm">
+        <Badge variant="neutral" className="rounded-lg px-2.5 py-1 text-sm bg-app-surface-muted text-app-text-muted border-none">
           {previous} → {current}
         </Badge>
       </div>
@@ -47,7 +47,7 @@ export const InsightsScreen: React.FC<Props> = ({ exercises, onSelectExercise })
   const renderValueMetric = (label: string, value: string) => (
     <div className="flex items-center gap-2">
       <span className="w-10 text-xs text-app-text-muted">{label}</span>
-      <Badge variant="accent" className="rounded-lg px-2.5 py-1 text-sm">
+      <Badge variant="neutral" className="rounded-lg px-2.5 py-1 text-sm bg-app-surface-muted text-app-text-muted border-none">
         {value}
       </Badge>
     </div>
@@ -65,7 +65,7 @@ export const InsightsScreen: React.FC<Props> = ({ exercises, onSelectExercise })
     if (recentProgressions.length === 0) return renderEmpty();
 
     return (
-        <div className="space-y-3">
+        <div className="space-y-3 pb-20">
           {recentProgressions.map((progression) => (
           <ListRow key={progression.exerciseId} onClick={() => onSelectExercise(progression.exerciseId)} className="cursor-pointer transition-colors active:bg-app-surface-muted">
             <div className="flex items-start justify-between gap-3">
@@ -91,7 +91,7 @@ export const InsightsScreen: React.FC<Props> = ({ exercises, onSelectExercise })
     if (topWeightExercises.length === 0) return renderEmpty();
 
     return (
-        <div className="space-y-3">
+        <div className="space-y-3 pb-20">
           {topWeightExercises.map((exercise) => (
           <ListRow key={exercise.exerciseId} onClick={() => onSelectExercise(exercise.exerciseId)} className="cursor-pointer transition-colors active:bg-app-surface-muted">
             <div className="flex items-start justify-between gap-3">

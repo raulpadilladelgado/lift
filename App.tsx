@@ -256,7 +256,7 @@ const App: React.FC = () => {
           </header>
         )}
 
-          <main className="animate-slideUp px-4 pb-24 pt-4">
+          <main className="animate-slideUp px-4 pb-48 pt-4">
           {currentExercise ? (
             <ExerciseDetail
               exercise={currentExercise}

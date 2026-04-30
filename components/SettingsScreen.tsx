@@ -89,11 +89,11 @@ export const SettingsScreen: React.FC<Props> = ({ onExport, onImport }) => {
         </Select>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-3 pb-32">
         <p className="ml-1 text-xs font-semibold uppercase tracking-wide text-app-text-muted">Backup</p>
         <ListRow padded={false}>
           <button onClick={onExport} className="flex w-full items-center gap-3 px-4 py-4 text-left transition-colors active:bg-app-surface-muted sm:px-5 sm:py-5">
-            <Badge variant="accent" className="rounded-xl px-3 py-3"><Download size={20} /></Badge>
+            <Badge variant="neutral" className="rounded-xl px-3 py-3 bg-app-surface-muted text-app-text-muted border-none"><Download size={20} /></Badge>
             <div className="text-left">
               <div className="font-semibold text-app-text">{t.actions.export}</div>
               <div className="text-xs text-app-text-muted">{t.labels.exportDesc}</div>
@@ -103,7 +103,7 @@ export const SettingsScreen: React.FC<Props> = ({ onExport, onImport }) => {
 
          <ListRow padded={false}>
            <button onClick={handleImportClick} className="flex w-full items-center gap-3 px-4 py-4 text-left transition-colors active:bg-app-surface-muted sm:px-5 sm:py-5">
-             <Badge variant="accent" className="rounded-xl px-3 py-3"><Upload size={20} /></Badge>
+             <Badge variant="neutral" className="rounded-xl px-3 py-3 bg-app-surface-muted text-app-text-muted border-none"><Upload size={20} /></Badge>
              <div className="text-left">
                <div className="font-semibold text-app-text">{t.actions.import}</div>
                <div className="text-xs text-app-text-muted">{t.labels.importDesc}</div>
