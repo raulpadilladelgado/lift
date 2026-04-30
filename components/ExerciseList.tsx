@@ -26,10 +26,13 @@ const ExerciseItem: React.FC<{
   const handlers = useLongPress({ onLongPress, onTap: onSelect });
 
   return (
-    <Surface {...handlers} className="cursor-pointer select-none active:bg-app-surface-muted">
+    <Surface 
+      {...handlers} 
+      className="cursor-pointer select-none active:bg-app-surface-muted border-none p-5"
+    >
       <div className="min-w-0">
-        <h3 className="text-base font-semibold text-app-text">{exercise.name}</h3>
-        <p className="mt-0.5 text-xs uppercase tracking-wide text-app-text-muted">
+        <h3 className="text-lg font-bold text-app-text leading-tight">{exercise.name}</h3>
+        <p className="mt-1 text-xs uppercase tracking-widest font-bold text-app-accent">
           {getTranslatedGroupName(exercise.muscleGroup)}
         </p>
       </div>
@@ -55,10 +58,10 @@ const GroupChip: React.FC<{
       onMouseUp={onMouseUp}
       onMouseLeave={onMouseLeave}
       className={cn(
-        'flex-shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors select-none',
+        'flex-shrink-0 rounded-full border-2 px-4 py-2 text-xs font-bold transition-all select-none',
         active
-          ? 'border-app-accent bg-app-accent text-app-accent-foreground'
-          : 'border-app-border bg-app-surface text-app-text-muted active:bg-app-surface-muted'
+          ? 'border-app-accent bg-app-accent text-app-accent-foreground scale-105'
+          : 'border-app-border bg-app-surface text-app-text-muted active:scale-95'
       )}
     >
       {getTranslatedGroupName(group)}
@@ -101,7 +104,7 @@ export const ExerciseList: React.FC<Props> = ({
   }, [activeGroup, muscleGroups]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-32">
       <SearchInput
         value={search}
         onChange={(e) => setSearch(e.target.value)}
@@ -114,10 +117,10 @@ export const ExerciseList: React.FC<Props> = ({
           <button
             onClick={() => setActiveGroup(null)}
             className={cn(
-              'flex-shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors select-none',
+              'flex-shrink-0 rounded-full border-2 px-4 py-2 text-xs font-bold transition-all select-none',
               activeGroup === null
-                ? 'border-app-accent bg-app-accent text-app-accent-foreground'
-                : 'border-app-border bg-app-surface text-app-text-muted active:bg-app-surface-muted'
+                ? 'border-app-accent bg-app-accent text-app-accent-foreground scale-105'
+                : 'border-app-border bg-app-surface text-app-text-muted active:scale-95'
             )}
           >
             {t.labels.allGroups}

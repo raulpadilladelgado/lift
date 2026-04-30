@@ -1,26 +1,27 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { storageManager } from './services/storageService';
-import { preferencesService } from './services/preferencesService';
-import { Exercise, ExerciseLog, Routine } from './types';
-import { ExerciseList } from './components/ExerciseList';
-import { ExerciseDetail } from './components/ExerciseDetail';
-import { SettingsScreen } from './components/SettingsScreen';
-import { InsightsScreen } from './components/InsightsScreen';
-import { RoutinesScreen } from './components/RoutinesScreen';
-import { BottomNav, ScreenType } from './components/BottomNav';
+import React, {useCallback, useEffect, useState} from 'react';
+import {makeId, storageManager} from './services/storageService';
+import {preferencesService} from './services/preferencesService';
+import {Exercise, ExerciseLog, Routine} from './types';
+import {ExerciseList} from './components/ExerciseList';
+import {ExerciseDetail} from './components/ExerciseDetail';
+import {SettingsScreen} from './components/SettingsScreen';
+import {InsightsScreen} from './components/InsightsScreen';
+import {RoutinesScreen} from './components/RoutinesScreen';
+import {BottomNav, ScreenType} from './components/BottomNav';
 import ConfirmModal from './components/ConfirmModal';
 import PromptModal from './components/PromptModal';
-import { Modal } from './components/Modal';
-import { ToastProvider } from './hooks/useToast';
-import { useTranslations, getTranslatedGroupName } from './utils/translations';
-import { Plus, Download, Share, PlusSquare, MoreVertical, Pencil } from 'lucide-react';
-import { makeId } from './services/storageService';
-import { Button } from './components/ui/Button';
-import { Input } from './components/ui/Input';
-import { Surface } from './components/ui/Surface';
-import { Badge } from './components/ui/Badge';
-import { MuscleGroupPicker } from './components/ui/MuscleGroupPicker';
-import { cn } from './utils/cn';
+import {Modal} from './components/Modal';
+import {ToastProvider} from './hooks/useToast';
+import {RestTimerProvider} from './hooks/useRestTimer';
+import {RestTimer} from './components/RestTimer';
+import {useTranslations} from './utils/translations';
+import {Download, MoreVertical, Plus, PlusSquare, Share} from 'lucide-react';
+import {Button} from './components/ui/Button';
+import {Input} from './components/ui/Input';
+import {Surface} from './components/ui/Surface';
+import {Badge} from './components/ui/Badge';
+import {MuscleGroupPicker} from './components/ui/MuscleGroupPicker';
+import {cn} from './utils/cn';
 
 const App: React.FC = () => {
   const t = useTranslations();
@@ -216,11 +217,12 @@ const App: React.FC = () => {
 
   const showHeader = currentScreen === 'home' && !currentExercise;
   const appHeaderClassName = 'px-4 pt-6 pb-4';
-  const appHeaderTitleClassName = 'text-center text-2xl font-bold text-app-text';
+  const appHeaderTitleClassName = 'text-center text-4xl font-black tracking-tighter text-app-text uppercase italic';
 
   return (
-    <ToastProvider>
-      <div className="min-h-screen pb-24 sm:mx-auto sm:max-w-md">
+    <RestTimerProvider>
+      <ToastProvider>
+        <div className="min-h-screen pb-24 sm:mx-auto sm:max-w-md">
 
         {showHeader && (
           <header className={cn('sticky top-0 z-20 bg-app-bg', appHeaderClassName)}>
@@ -254,7 +256,7 @@ const App: React.FC = () => {
           </header>
         )}
 
-          <main className="animate-slideUp px-4 pb-24 pt-4">
+          <main className="animate-slideUp px-4 pb-48 pt-4">
           {currentExercise ? (
             <ExerciseDetail
               exercise={currentExercise}
@@ -311,22 +313,24 @@ const App: React.FC = () => {
               resetSignal={screenResetSignal}
             />
           ) : (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="space-y-8">
+              <div className="flex flex-col gap-3">
                 <Button
                   onClick={() => { setNewExerciseName(''); setNewExerciseGroup(muscleGroups[0] ?? ''); setAddingExercise(true); }}
-                  className="w-full"
+                  size="lg"
+                  className="w-full rounded-2xl shadow-xl shadow-app-accent/10"
                 >
-                  <Plus size={18} />
+                  <Plus size={24} strokeWidth={3} />
                   {t.labels.newExercise}
                 </Button>
 
                 <Button
                   onClick={() => setAddingGroup(true)}
                   variant="secondary"
-                  className="w-full border-dashed"
+                  size="md"
+                  className="w-full border-2 border-dashed rounded-2xl border-app-border/50 text-app-text-muted"
                 >
-                  <Plus size={20} className="mr-2" />
+                  <Plus size={18} />
                   {t.actions.addGroup}
                 </Button>
               </div>
@@ -402,11 +406,7 @@ const App: React.FC = () => {
 
         <Modal open={!!movingExercise} onClose={() => setMovingExercise(null)} position="center">
           {movingExercise && (
-            <div
-              className="mx-4 w-full max-w-md rounded-2xl border border-app-border bg-app-surface p-6 animate-scaleIn"
-              onClick={(e) => e.stopPropagation()}
-              onTouchEnd={(e) => e.stopPropagation()}
-            >
+            <div className="p-6" onClick={(e) => e.stopPropagation()}>
               <h2 className="mb-2 text-xl font-bold text-app-text">{t.actions.move}</h2>
               <p className="mb-4 text-sm text-app-text-muted">{movingExercise.name}</p>
               <div className="mb-6">
@@ -502,11 +502,7 @@ const App: React.FC = () => {
         )}
 
         <Modal open={isInstallModalOpen} onClose={() => setIsInstallModalOpen(false)} position="center">
-          <div
-            className="mx-4 max-h-[80vh] w-full max-w-sm animate-scaleIn overflow-y-auto rounded-2xl border border-app-border bg-app-surface p-6"
-            onClick={(e) => e.stopPropagation()}
-            onTouchEnd={(e) => e.stopPropagation()}
-          >
+          <div className="p-6">
             <h2 className="mb-6 text-center text-xl font-bold text-app-text">{t.labels.installGuide}</h2>
             <div className="space-y-6">
               <div className="space-y-2">
@@ -545,8 +541,10 @@ const App: React.FC = () => {
             </Button>
           </div>
         </Modal>
+        <RestTimer />
       </div>
     </ToastProvider>
+  </RestTimerProvider>
   );
 };
 

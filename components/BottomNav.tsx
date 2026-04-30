@@ -30,30 +30,37 @@ export const BottomNav: React.FC<Props> = ({ currentScreen, onScreenChange, onSc
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-30 border-t border-app-border bg-app-surface backdrop-blur-sm"
+      className="fixed bottom-0 left-0 right-0 z-30 border-t border-app-border/30 bg-app-surface/80 backdrop-blur-lg"
       style={{
         paddingBottom: 'env(safe-area-inset-bottom)',
         paddingLeft: 'env(safe-area-inset-left)',
         paddingRight: 'env(safe-area-inset-right)',
       }}
     >
-      <div className="mx-auto flex max-w-lg justify-around">
+      <div className="mx-auto flex max-w-lg justify-around px-2">
         {navItems.map((item) => (
           <button
             key={item.id}
             onClick={() => handleTap(item.id)}
             className={cn(
-              'flex flex-1 flex-col items-center justify-center gap-1 py-2.5 transition-colors active:opacity-70',
-              currentScreen === item.id ? 'font-semibold text-app-text' : 'text-app-text-muted hover:text-app-text'
+              'flex flex-1 flex-col items-center justify-center gap-1.5 py-4 transition-all active:scale-90',
+              currentScreen === item.id ? 'text-app-accent' : 'text-app-text-muted'
             )}
             aria-label={item.label}
             aria-current={currentScreen === item.id ? 'page' : undefined}
           >
-            <div className="w-6 h-6 flex items-center justify-center">{item.icon}</div>
-            <span className="text-[10px] font-semibold leading-none text-center truncate">{item.label}</span>
-            {currentScreen === item.id && (
-              <div className="h-0.5 w-6 rounded-full bg-app-accent" />
-            )}
+            <div className={cn(
+              "w-6 h-6 flex items-center justify-center transition-transform",
+              currentScreen === item.id && "scale-110"
+            )}>
+              {item.icon}
+            </div>
+            <span className={cn(
+              "text-[10px] font-black uppercase tracking-widest leading-none text-center truncate transition-colors",
+              currentScreen === item.id ? "text-app-accent" : "text-app-text-muted"
+            )}>
+              {item.label}
+            </span>
           </button>
         ))}
       </div>
