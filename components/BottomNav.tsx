@@ -30,7 +30,7 @@ export const BottomNav: React.FC<Props> = ({ currentScreen, onScreenChange, onSc
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-30 border-t border-app-border/30 bg-app-surface/80 backdrop-blur-lg"
+      className="fixed bottom-0 left-0 right-0 z-30  border-app-border/80 bg-app-surface backdrop-blur-2xl"
       style={{
         paddingBottom: 'env(safe-area-inset-bottom)',
         paddingLeft: 'env(safe-area-inset-left)',
@@ -43,22 +43,18 @@ export const BottomNav: React.FC<Props> = ({ currentScreen, onScreenChange, onSc
             key={item.id}
             onClick={() => handleTap(item.id)}
             className={cn(
-              'flex flex-1 flex-col items-center justify-center gap-1.5 py-4 transition-all active:scale-90',
-              currentScreen === item.id ? 'text-app-accent' : 'text-app-text-muted'
+              'flex flex-1 flex-col items-center justify-center gap-1.5 py-4 transition-all active:scale-90 rounded-lg mx-1',
+              currentScreen === item.id
+                ? 'bg-app-accent text-black'
+                : 'text-app-text-muted'
             )}
             aria-label={item.label}
             aria-current={currentScreen === item.id ? 'page' : undefined}
           >
-            <div className={cn(
-              "w-6 h-6 flex items-center justify-center transition-transform",
-              currentScreen === item.id && "scale-110"
-            )}>
+            <div className="w-6 h-6 flex items-center justify-center">
               {item.icon}
             </div>
-            <span className={cn(
-              "text-[10px] font-black uppercase tracking-widest leading-none text-center truncate transition-colors",
-              currentScreen === item.id ? "text-app-accent" : "text-app-text-muted"
-            )}>
+            <span className="text-[10px] font-black uppercase tracking-widest leading-none text-center truncate">
               {item.label}
             </span>
           </button>

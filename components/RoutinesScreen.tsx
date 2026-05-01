@@ -750,38 +750,68 @@ const RoutineExerciseCard: React.FC<RoutineExerciseCardProps> = ({
   const handlers = useLongPress({ onLongPress, onTap });
 
   return (
-    <ListRow {...handlers} className="select-none">
-      <div className="mb-2 flex items-start justify-between">
+    <ListRow {...handlers} className="select-none p-5 flex flex-col gap-4">
+      <div className="flex items-start justify-between">
         <div className="min-w-0 flex-1">
-          <h3 className="text-base font-semibold text-app-text">{exercise.name}</h3>
-          <p className="mt-0.5 text-xs uppercase tracking-wide text-app-text-muted">{getTranslatedGroupName(exercise.muscleGroup)}</p>
+          <h3 className="text-lg font-bold text-app-text leading-tight">{exercise.name}</h3>
+          <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-app-text-muted">
+            {getTranslatedGroupName(exercise.muscleGroup)}
+          </p>
         </div>
         {alternativeExercise && (
-          <button onClick={onToggleAlternative} onMouseDown={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()} className="ml-2 flex-shrink-0 rounded-full border border-app-border bg-app-surface px-2 py-1 text-xs font-semibold text-app-text active:opacity-70">
-            <Shuffle size={11} className="inline-block" /> {isUsingAlternative ? t.labels.swapToMain : t.labels.swapToAlternative}
+          <button
+            onClick={onToggleAlternative}
+            onMouseDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            className="ml-2 flex-shrink-0 rounded-lg border border-app-border bg-app-surface-muted px-2.5 py-1.5 text-xs font-semibold text-app-text active:opacity-70 transition-colors"
+          >
+            <Shuffle size={12} className="inline-block mr-1" />
+            {isUsingAlternative ? t.labels.swapToMain : t.labels.swapToAlternative}
           </button>
         )}
       </div>
 
-      <div className="mb-3 flex items-center gap-2">
-        <Badge variant="accent" className="rounded-lg px-2.5 py-1 text-sm bg-app-accent/20 text-app-accent border-none">
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge variant="accent" className="rounded-md px-2 py-1 text-[11px] font-black uppercase tracking-wider bg-app-accent text-app-accent-foreground shadow-sm border-none">
           {routineExercise.reps ? `${routineExercise.sets} sets × ${routineExercise.reps} reps` : `${routineExercise.sets} sets`}
         </Badge>
         {routineExercise.toFailure && <Badge variant="danger">{t.labels.toFailure}</Badge>}
         {routineExercise.dropset && <Badge variant="warning">{t.labels.dropset}</Badge>}
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-3 items-end">
         <div>
-          <label className="mb-1 block text-xs font-medium text-app-text-muted">{t.labels.weightShort}</label>
-          <Input type="number" inputMode="decimal" value={form.weight} onChange={(e) => onUpdateForm('weight', e.target.value)} onMouseDown={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()} placeholder="0" compact />
+          <label className="mb-1.5 block text-[11px] font-bold uppercase text-app-text-muted">{t.labels.weightShort}</label>
+          <Input
+            type="number"
+            inputMode="decimal"
+            value={form.weight}
+            onChange={(e) => onUpdateForm('weight', e.target.value)}
+            onMouseDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            placeholder="0"
+            className="font-mono text-center font-bold"
+            compact
+          />
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-app-text-muted">{t.labels.reps}</label>
-          <Input type="number" inputMode="numeric" value={form.reps} onChange={(e) => onUpdateForm('reps', e.target.value)} onMouseDown={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()} placeholder="0" compact />
+          <label className="mb-1.5 block text-[11px] font-bold uppercase text-app-text-muted">{t.labels.reps}</label>
+          <Input
+            type="number"
+            inputMode="numeric"
+            value={form.reps}
+            onChange={(e) => onUpdateForm('reps', e.target.value)}
+            onMouseDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            placeholder="0"
+            className="font-mono text-center font-bold"
+            compact
+          />
         </div>
-        <div className="flex items-end">
-          <Button onClick={onLog} className="w-full">{t.actions.log}</Button>
+        <div>
+          <Button onClick={onLog} variant="primary" className="w-full font-black text-sm h-10 shadow-sm">
+            {t.actions.log}
+          </Button>
         </div>
       </div>
     </ListRow>

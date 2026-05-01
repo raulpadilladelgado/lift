@@ -38,9 +38,9 @@ export const RoutineCard: React.FC<Props> = ({ routine, onClick, onEdit, onDelet
         {...handlers}
       >
         <div className="flex items-center justify-between">
-          <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-semibold text-app-text">{routine.name}</h3>
-            <p className="text-xs text-app-text-muted mt-1">
+          <div className="min-w-0 flex-1">
+            <h3 className="break-words text-lg font-semibold text-app-text">{routine.name}</h3>
+            <p className="mt-1 break-words text-xs text-app-text-muted">
               {routine.exercises.length} {t.labels.exercises}
             </p>
           </div>

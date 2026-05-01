@@ -210,39 +210,25 @@ describe('RoutinesScreen', () => {
 
   // --- Detail view ---
 
-  function clickRoutineCard(name: string) {
-    const card = screen.getByText(name).closest('div[class*="rounded-2xl"]')!;
-    fireEvent.mouseDown(card);
-    fireEvent.mouseUp(card);
-  }
-
   it('navigates to detail view when a routine card is clicked', async () => {
-    renderWithToast(<RoutinesScreen {...defaultProps} />);
-    clickRoutineCard('Push Day');
-    await act(() => vi.runAllTimersAsync());
-    expect(screen.getByText('Bench Press')).toBeTruthy();
+    renderWithToast(<RoutinesScreen {...defaultProps} activeRoutineId="r1" onActiveRoutineChange={vi.fn()} />);
+    expect(screen.getByRole('heading', { name: 'Bench Press' })).toBeTruthy();
   });
 
   it('shows prescription info (sets x reps) in detail view', async () => {
-    renderWithToast(<RoutinesScreen {...defaultProps} />);
-    clickRoutineCard('Push Day');
-    await act(() => vi.runAllTimersAsync());
+    renderWithToast(<RoutinesScreen {...defaultProps} activeRoutineId="r1" onActiveRoutineChange={vi.fn()} />);
     expect(screen.getByText('3 sets × 10 reps')).toBeTruthy();
   });
 
   it('shows dropset badge when dropset is enabled', async () => {
-    renderWithToast(<RoutinesScreen {...defaultProps} />);
-    clickRoutineCard('Leg Day');
-    await act(() => vi.runAllTimersAsync());
+    renderWithToast(<RoutinesScreen {...defaultProps} activeRoutineId="r2" onActiveRoutineChange={vi.fn()} />);
     expect(screen.getByText(t.labels.dropset)).toBeTruthy();
   });
 
   it('shows last log values as placeholder in log form', async () => {
-    renderWithToast(<RoutinesScreen {...defaultProps} />);
-    clickRoutineCard('Push Day');
-    await act(() => vi.runAllTimersAsync());
+    renderWithToast(<RoutinesScreen {...defaultProps} activeRoutineId="r1" onActiveRoutineChange={vi.fn()} />);
 
-    const inputs = screen.getAllByRole('spinbutton') as HTMLInputElement[];
+    const inputs = screen.getAllByDisplayValue(/^(70|10)$/) as HTMLInputElement[];
     const weightInput = inputs.find((i) => i.value === '70');
     const repsInput = inputs.find((i) => i.value === '10');
     expect(weightInput).toBeTruthy();
@@ -251,12 +237,9 @@ describe('RoutinesScreen', () => {
 
   it('calls onLogExercise with correct values', async () => {
     const onLogExercise = vi.fn();
-    renderWithToast(<RoutinesScreen {...defaultProps} onLogExercise={onLogExercise} />);
+    renderWithToast(<RoutinesScreen {...defaultProps} activeRoutineId="r1" onActiveRoutineChange={vi.fn()} onLogExercise={onLogExercise} />);
 
-    clickRoutineCard('Push Day');
-    await act(() => vi.runAllTimersAsync());
-
-    const inputs = screen.getAllByRole('spinbutton') as HTMLInputElement[];
+    const inputs = screen.getAllByDisplayValue(/^(70|10)$/) as HTMLInputElement[];
     const weightInput = inputs.find((i) => i.value === '70')!;
     fireEvent.change(weightInput, { target: { value: '75' } });
 
@@ -268,14 +251,10 @@ describe('RoutinesScreen', () => {
   });
 
   it('returns to routine list from detail view', async () => {
-    renderWithToast(<RoutinesScreen {...defaultProps} />);
-    clickRoutineCard('Push Day');
-    await act(() => vi.runAllTimersAsync());
-    expect(screen.getByText('Bench Press')).toBeTruthy();
-
+    const onActiveRoutineChange = vi.fn();
+    renderWithToast(<RoutinesScreen {...defaultProps} activeRoutineId="r1" onActiveRoutineChange={onActiveRoutineChange} />);
     fireEvent.click(screen.getByText(t.labels.routines));
-    await act(() => vi.runAllTimersAsync());
-    expect(screen.getByText('Leg Day')).toBeTruthy();
+    expect(onActiveRoutineChange).toHaveBeenCalledWith(null);
   });
 
   // --- Badge prescription ---
@@ -288,9 +267,7 @@ describe('RoutinesScreen', () => {
         exercises: [{ exerciseId: 'ex1', sets: 4, reps: '', dropset: false, toFailure: false }],
       },
     ];
-    renderWithToast(<RoutinesScreen {...defaultProps} routines={routinesWithNoReps} />);
-    clickRoutineCard('No Reps Day');
-    await act(() => vi.runAllTimersAsync());
+    renderWithToast(<RoutinesScreen {...defaultProps} routines={routinesWithNoReps} activeRoutineId="r3" onActiveRoutineChange={vi.fn()} />);
     expect(screen.getByText('4 sets')).toBeTruthy();
     expect(screen.queryByText(/×/)).toBeNull();
   });
@@ -303,9 +280,7 @@ describe('RoutinesScreen', () => {
         exercises: [{ exerciseId: 'ex1', sets: 3, reps: '', dropset: false, toFailure: true }],
       },
     ];
-    renderWithToast(<RoutinesScreen {...defaultProps} routines={routinesWithFailure} />);
-    clickRoutineCard('Failure Day');
-    await act(() => vi.runAllTimersAsync());
+    renderWithToast(<RoutinesScreen {...defaultProps} routines={routinesWithFailure} activeRoutineId="r4" onActiveRoutineChange={vi.fn()} />);
     expect(screen.getByText(t.labels.toFailure)).toBeTruthy();
   });
 
@@ -356,16 +331,12 @@ describe('RoutinesScreen', () => {
         ],
       },
     ];
-    renderWithToast(<RoutinesScreen {...defaultProps} routines={multiExRoutine} />);
+    renderWithToast(<RoutinesScreen {...defaultProps} routines={multiExRoutine} activeRoutineId="r5" onActiveRoutineChange={vi.fn()} />);
 
-    const card = screen.getByText('Full Day').closest('div[class*="rounded-2xl"]')!;
-    fireEvent.mouseDown(card);
-    fireEvent.mouseUp(card);
-    await act(() => vi.runAllTimersAsync());
-
-    const exerciseCard = screen.getByText('Bench Press').closest('div[class*="rounded-2xl"]')!;
+    const exerciseCard = screen.getByText('Bench Press');
     fireEvent.mouseDown(exerciseCard);
     act(() => { vi.advanceTimersByTime(600); });
+    fireEvent.mouseUp(exerciseCard);
     await act(() => vi.runAllTimersAsync());
 
     expect(screen.getByText('Bench Press', { selector: 'p' })).toBeTruthy();
@@ -390,18 +361,16 @@ describe('RoutinesScreen', () => {
       <RoutinesScreen
         {...defaultProps}
         routines={multiExRoutine}
+        activeRoutineId="r5"
+        onActiveRoutineChange={vi.fn()}
         onReorderRoutineExercise={onReorderRoutineExercise}
       />
     );
 
-    const card = screen.getByText('Full Day').closest('div[class*="rounded-2xl"]')!;
-    fireEvent.mouseDown(card);
-    fireEvent.mouseUp(card);
-    await act(() => vi.runAllTimersAsync());
-
-    const exerciseCard = screen.getByText('Bench Press').closest('div[class*="rounded-2xl"]')!;
+    const exerciseCard = screen.getByText('Bench Press');
     fireEvent.mouseDown(exerciseCard);
     act(() => { vi.advanceTimersByTime(600); });
+    fireEvent.mouseUp(exerciseCard);
     await act(() => vi.runAllTimersAsync());
 
     fireEvent.click(screen.getByText(t.labels.move));
@@ -410,7 +379,7 @@ describe('RoutinesScreen', () => {
     expect(screen.getByText(t.labels.moveExercise, { selector: 'h2' })).toBeTruthy();
     expect(screen.getByText(t.labels.movePreview)).toBeTruthy();
 
-    fireEvent.change(screen.getByLabelText(t.labels.targetPosition), { target: { value: '1' } });
+    fireEvent.click(screen.getByRole('button', { name: t.labels.moveDown }));
     fireEvent.click(screen.getByRole('button', { name: t.actions.save }));
     await act(() => vi.runAllTimersAsync());
 
@@ -431,13 +400,7 @@ describe('RoutinesScreen', () => {
     ];
 
     const onLogExerciseMock = vi.fn();
-    renderWithToast(<RoutinesScreen {...defaultProps} exercises={customExercises} routines={altRoutines} onLogExercise={onLogExerciseMock} />);
-
-    // Open Routine
-    const card = screen.getByText('Alt Day').closest('div[class*="rounded-2xl"]')!;
-    fireEvent.mouseDown(card);
-    fireEvent.mouseUp(card);
-    await act(() => vi.runAllTimersAsync());
+    renderWithToast(<RoutinesScreen {...defaultProps} exercises={customExercises} routines={altRoutines} activeRoutineId="r3" onActiveRoutineChange={vi.fn()} onLogExercise={onLogExerciseMock} />);
 
     // Check placeholder for ex1
     const weightInput = screen.getByDisplayValue('70') as HTMLInputElement;

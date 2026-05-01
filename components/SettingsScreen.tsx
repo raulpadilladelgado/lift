@@ -89,7 +89,7 @@ export const SettingsScreen: React.FC<Props> = ({ onExport, onImport }) => {
         </Select>
       </div>
 
-      <div className="space-y-3 pb-32">
+      <div className="space-y-3">
         <p className="ml-1 text-xs font-semibold uppercase tracking-wide text-app-text-muted">Backup</p>
         <ListRow padded={false}>
           <button onClick={onExport} className="flex w-full items-center gap-3 px-4 py-4 text-left transition-colors active:bg-app-surface-muted sm:px-5 sm:py-5">

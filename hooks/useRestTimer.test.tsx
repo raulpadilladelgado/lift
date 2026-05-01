@@ -6,9 +6,27 @@ import { RestTimerProvider, useRestTimer } from './useRestTimer';
 describe('useRestTimer', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-01-01T00:00:00.000Z'));
+    const store: Record<string, string> = {};
+    Object.defineProperty(window, 'localStorage', {
+      configurable: true,
+      value: {
+        getItem: vi.fn((key: string) => store[key] ?? null),
+        setItem: vi.fn((key: string, value: string) => {
+          store[key] = value;
+        }),
+        removeItem: vi.fn((key: string) => {
+          delete store[key];
+        }),
+        clear: vi.fn(() => {
+          Object.keys(store).forEach((key) => delete store[key]);
+        }),
+      },
+    });
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
@@ -39,6 +57,26 @@ describe('useRestTimer', () => {
     });
 
     expect(result.current.remainingTime).toBe(59);
+  });
+
+  it('debe sincronizarse al volver visible la app', () => {
+    const { result } = renderHook(() => useRestTimer(), { wrapper });
+
+    act(() => {
+      result.current.startTimer(60);
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(15000);
+    });
+
+    Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' });
+
+    act(() => {
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+
+    expect(result.current.remainingTime).toBe(45);
   });
 
   it('debe detenerse al llegar a cero', () => {
@@ -88,5 +126,19 @@ describe('useRestTimer', () => {
     });
 
     expect(result.current.isMinimized).toBe(true);
+  });
+
+  it('debe iniciar desde el estado guardado', () => {
+    window.localStorage.setItem(
+      'restTimerState',
+      JSON.stringify({ remainingTime: 30, duration: 90, isMinimized: false, isActive: true })
+    );
+
+    const { result } = renderHook(() => useRestTimer(), { wrapper });
+
+    expect(result.current.remainingTime).toBe(30);
+    expect(result.current.duration).toBe(90);
+    expect(result.current.isMinimized).toBe(true);
+    expect(result.current.isActive).toBe(false);
   });
 });

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { RestTimerState } from '../types';
 
 interface RestTimerContextType extends RestTimerState {
@@ -12,22 +12,31 @@ interface RestTimerContextType extends RestTimerState {
 
 const RestTimerContext = createContext<RestTimerContextType | undefined>(undefined);
 
+const STORAGE_KEY = 'restTimerState';
+
 export const RestTimerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, setState] = useState<RestTimerState>(() => {
     try {
       if (typeof localStorage !== 'undefined' && localStorage.getItem) {
-        const saved = localStorage.getItem('restTimerState');
+        const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
-          const parsed = JSON.parse(saved);
+          const parsed = JSON.parse(saved) as Partial<RestTimerState>;
           return {
             ...parsed,
-            isActive: false, // Never start active after reload for safety
-            isMinimized: true // Always start minimized on app load as requested
+            remainingTime: parsed.remainingTime ?? 0,
+            duration: parsed.duration ?? 90,
+            isActive: false,
+            isMinimized: true,
           };
         }
       }
-    } catch (e) {
-      // Fallback to default
+    } catch {
+      return {
+        remainingTime: 0,
+        isActive: false,
+        duration: 90,
+        isMinimized: true,
+      };
     }
     return {
       remainingTime: 0,
@@ -37,38 +46,86 @@ export const RestTimerProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     };
   });
 
+  const endTimeRef = useRef<number | null>(null);
+
   useEffect(() => {
     try {
       if (typeof localStorage !== 'undefined' && localStorage.setItem) {
-        localStorage.setItem('restTimerState', JSON.stringify({
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
           remainingTime: state.remainingTime,
           duration: state.duration,
           isMinimized: state.isMinimized,
-          isActive: false // Don't persist active state
+          isActive: false,
         }));
       }
-    } catch (e) {
-      // Ignore
+    } catch {
+      // Ignore storage failures.
     }
   }, [state.remainingTime, state.duration, state.isMinimized]);
 
+  const syncTimer = useCallback(() => {
+    const endTime = endTimeRef.current;
+    if (!endTime) return;
+
+    const timeLeft = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+    setState((prev) => ({
+      ...prev,
+      remainingTime: timeLeft,
+      isActive: timeLeft > 0,
+    }));
+
+    if (timeLeft <= 0) {
+      endTimeRef.current = null;
+    }
+  }, []);
+
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval> | undefined;
 
     if (state.isActive && state.remainingTime > 0) {
-      interval = setInterval(() => {
+      endTimeRef.current = endTimeRef.current ?? Date.now() + state.remainingTime * 1000;
+
+      const tick = () => {
+        const endTime = endTimeRef.current;
+        if (!endTime) return;
+
+        const timeLeft = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+
         setState((prev) => ({
           ...prev,
-          remainingTime: Math.max(0, prev.remainingTime - 1),
-          isActive: prev.remainingTime > 1,
+          remainingTime: timeLeft,
+          isActive: timeLeft > 0,
         }));
-      }, 1000);
+
+        if (timeLeft <= 0 && interval) {
+          clearInterval(interval);
+          interval = undefined;
+          endTimeRef.current = null;
+        }
+      };
+
+      tick();
+      interval = setInterval(tick, 1000);
     }
 
-    return () => clearInterval(interval);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [state.isActive, state.remainingTime]);
 
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        syncTimer();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [syncTimer]);
+
   const startTimer = useCallback((seconds: number) => {
+    endTimeRef.current = seconds > 0 ? Date.now() + seconds * 1000 : null;
     setState((prev) => ({
       remainingTime: seconds,
       isActive: seconds > 0,
@@ -78,19 +135,24 @@ export const RestTimerProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, []);
 
   const stopTimer = useCallback(() => {
+    endTimeRef.current = null;
     setState((prev) => ({ ...prev, isActive: false }));
   }, []);
 
   const resetTimer = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      remainingTime: prev.duration,
-      isActive: true,
-      isMinimized: false,
-    }));
+    setState((prev) => {
+      endTimeRef.current = prev.duration > 0 ? Date.now() + prev.duration * 1000 : null;
+      return {
+        ...prev,
+        remainingTime: prev.duration,
+        isActive: prev.duration > 0,
+        isMinimized: false,
+      };
+    });
   }, []);
 
   const addTime = useCallback((seconds: number) => {
+    endTimeRef.current = endTimeRef.current ? endTimeRef.current + seconds * 1000 : null;
     setState((prev) => ({
       ...prev,
       remainingTime: prev.remainingTime + seconds,
@@ -103,7 +165,10 @@ export const RestTimerProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, []);
 
   const setDuration = useCallback((duration: number) => {
-    setState((prev) => ({ ...prev, duration, remainingTime: duration }));
+    setState((prev) => {
+      endTimeRef.current = prev.isActive && duration > 0 ? Date.now() + duration * 1000 : null;
+      return { ...prev, duration, remainingTime: duration };
+    });
   }, []);
 
   return (

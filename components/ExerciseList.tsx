@@ -31,8 +31,8 @@ const ExerciseItem: React.FC<{
       className="cursor-pointer select-none active:bg-app-surface-muted border-none p-5"
     >
       <div className="min-w-0">
-        <h3 className="text-lg font-bold text-app-text leading-tight">{exercise.name}</h3>
-        <p className="mt-1 text-xs uppercase tracking-widest font-bold text-app-accent">
+        <h3 className="break-words text-lg font-bold leading-tight text-app-text">{exercise.name}</h3>
+        <p className="mt-1 break-words text-xs font-bold uppercase tracking-widest text-app-text-muted/80">
           {getTranslatedGroupName(exercise.muscleGroup)}
         </p>
       </div>
